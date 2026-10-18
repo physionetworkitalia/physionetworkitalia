@@ -277,6 +277,8 @@
     <h2 style="color:var(--petrol-900); font-size:26px; margin-bottom:6px;">Trova un professionista</h2>
     <p style="color:var(--ink-soft); font-size:14px; margin-bottom:20px;">Filtra per specializzazione, area geografica, modalità o tipo di paziente trattato.</p>
 
+    <div id="search-gate" style="display:none;"></div>
+    <div id="search-tools">
     <div class="geo-box">
       <div class="geo-row">
         <input type="text" id="geo-q" placeholder="Cerca vicino a: città o indirizzo">
@@ -311,6 +313,7 @@
 
     <div class="results-count mono" id="results-count"></div>
     <div id="results"></div>
+    </div>
   </section>
 
   <section class="panel" id="annunci">
@@ -673,6 +676,7 @@ async function logout(){
   await sb.auth.signOut();
   currentUser = null;
   currentProf = null;
+  profLoadTried = false;
   editingProfId = null;
   resetForm();
   document.getElementById("in-prof").value = "Fisioterapista";
@@ -750,6 +754,17 @@ async function loadResults(){
     countEl.textContent = "";
     return;
   }
+  await ensureProfLoaded();
+  const gate = document.getElementById("search-gate");
+  const tools = document.getElementById("search-tools");
+  if(!isMember()){
+    tools.style.display = "none";
+    gate.style.display = "block";
+    gate.innerHTML = gateHtml();
+    return;
+  }
+  tools.style.display = "block";
+  gate.style.display = "none";
   resultsEl.innerHTML = '<div class="empty">Caricamento...</div>';
 
   let query = sb.from("professionisti").select("*").eq("membership_attiva", true).order("created_at", { ascending:false });
@@ -878,8 +893,8 @@ async function initReviewPageIfNeeded(){
   document.getElementById("recensione").classList.add("active");
 
   if(CONFIGURED){
-    const { data } = await sb.from("professionisti").select("nome").eq("id", id).single();
-    document.getElementById("rev-prof-name").textContent = data ? data.nome : "questo professionista";
+    const { data } = await sb.rpc("nome_professionista", { p_id: id });
+    document.getElementById("rev-prof-name").textContent = data || "questo professionista";
   }
 
   document.querySelectorAll(".hand-pick").forEach(el=>{
@@ -911,6 +926,37 @@ function escapeHtml(s){ const d = document.createElement("div"); d.textContent =
 ["f-spec","f-area","f-mod","f-paz","f-raggio"].forEach(id=>{
   document.getElementById(id).addEventListener("input", loadResults);
 });
+
+/* ================= ACCESSO ALLA RICERCA: SOLO SOCI ================= */
+let profLoadTried = false;
+
+async function ensureProfLoaded(){
+  if(!currentUser || currentProf || profLoadTried) return;
+  profLoadTried = true;
+  const { data } = await sb.from("professionisti").select("*").eq("user_id", currentUser.id).maybeSingle();
+  if(data) currentProf = data;
+}
+
+async function refreshMembership(){
+  profLoadTried = false;
+  currentProf = null;
+  await ensureProfLoaded();
+  if(currentProf && currentProf.membership_attiva){ showToast("Membership attiva. Buona ricerca!"); }
+  else { showToast("La membership non risulta ancora attiva."); }
+  loadResults();
+}
+
+function gateHtml(){
+  if(!currentProf){
+    return `<div class="notice error"><strong>Ricerca riservata ai soci.</strong> Per cercare i colleghi, anche sulla mappa, serve un profilo con membership attiva. Crea prima il tuo profilo.<br><br>
+      <button class="btn btn-primary btn-small" onclick="switchPanel('iscrizione')">Crea il mio profilo</button></div>`;
+  }
+  const email = encodeURIComponent(currentProf.email || (currentUser && currentUser.email) || "");
+  return `<div class="notice error"><strong>Ricerca riservata ai soci.</strong> La ricerca dei colleghi, anche per posizione sulla mappa, è disponibile solo con la membership attiva.<br><br>
+    <a href="${STRIPE_LINK_MENSILE}?prefilled_email=${email}" target="_blank" class="btn btn-primary btn-small" style="text-decoration:none; display:inline-block; margin-right:8px;">Attiva mensile — 10 €/mese</a>
+    <a href="${STRIPE_LINK_ANNUALE}?prefilled_email=${email}" target="_blank" class="btn btn-ghost btn-small" style="text-decoration:none; display:inline-block;">Attiva annuale — 100 €/anno</a>
+    <p style="font-size:12px; margin-top:12px;">Dopo il pagamento l'attivazione richiede una breve verifica manuale. Se hai già pagato e hai ricevuto conferma, <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="refreshMembership()">ricontrolla lo stato</span>.</p></div>`;
+}
 
 /* ================= RICERCA PER POSIZIONE E MAPPA ================= */
 let geoOrigin = null;
@@ -1081,6 +1127,7 @@ async function publishAnnuncio(){
 }
 
 async function loadAnnunci(){
+  await ensureProfLoaded();
   const listEl = document.getElementById("ann-list");
   const inEl = document.getElementById("ann-incoming");
   inEl.innerHTML = "";

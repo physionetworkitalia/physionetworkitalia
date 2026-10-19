@@ -252,6 +252,10 @@
   .quota-bar.free{ border-left-color:#C0453A; }
   .hero-banner .hero-link{ color:#fff; text-decoration:underline; cursor:pointer; font-size:14px; align-self:center; }
 
+  .albo-badge.ok{ display:inline-block; background:rgba(34,195,166,0.16); color:#0b6b5a; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:600; }
+  .check{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); margin:2px 0 14px; cursor:pointer; }
+  .check input{ width:auto; margin:0; }
+
   .toast{
     position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
     background:var(--petrol-900); color:var(--paper); padding:12px 20px; border-radius:8px;
@@ -411,19 +415,19 @@
 
   <section class="panel" id="annunci">
     <h2 style="color:var(--petrol-900); font-size:26px; margin-bottom:6px;">Annunci</h2>
-    <p style="color:var(--ink-soft); font-size:14px; margin-bottom:16px;">Qui compaiono solo il tipo di paziente e la zona. Modalità (studio o domicilio) ed eventuale trattamento li vede solo chi è socio e ne fa richiesta, dopo la tua approvazione.</p>
+    <p style="color:var(--ink-soft); font-size:14px; margin-bottom:16px;">Qui compaiono solo il tipo di paziente e la zona. Sono visibili a tutti tipo di paziente, zona e se la prestazione è a studio o a domicilio. L'eventuale trattamento lo vede solo chi è socio e ne fa richiesta, dopo la tua approvazione.</p>
 
     <button class="btn btn-primary" onclick="toggleAnnForm()" style="margin-bottom:16px;">Pubblica un annuncio</button>
 
     <div class="card" id="ann-form" style="display:none; margin-bottom:20px;">
       <div class="notice error">
-        Non inserire nome, cognome o altri dati del paziente. Indica solo tipo di paziente, zona, se la prestazione è a studio o a domicilio ed eventuale trattamento.
+        Non inserire nome, cognome o altri dati del paziente. Indica solo tipo di paziente, paese o provincia, se la prestazione è a studio o a domicilio ed eventuale trattamento.
       </div>
       <div class="row2">
         <div class="field"><label>Tipo di paziente</label>
           <select id="ann-tipo"><option value="">Seleziona...</option></select>
         </div>
-        <div class="field"><label>Zona richiesta</label><input type="text" id="ann-zona" placeholder="Es. Napoli, Vomero"></div>
+        <div class="field"><label>Paese o provincia</label><input type="text" id="ann-zona" placeholder="Es. Pozzuoli oppure Napoli"></div>
       </div>
       <div class="row2">
         <div class="field"><label>Studio o domicilio</label>
@@ -438,7 +442,7 @@
           <select id="ann-trat"><option value="">Nessuno in particolare</option></select>
         </div>
       </div>
-      <p style="font-size:12px; color:var(--ink-soft); margin:-4px 0 14px;">Modalità e trattamento sono visibili solo ai colleghi che ne fanno richiesta e che approvi tu. Nella zona scrivi solo città o quartiere, mai un indirizzo.</p>
+      <p style="font-size:12px; color:var(--ink-soft); margin:-4px 0 14px;">Tipo di paziente, zona e studio/domicilio sono visibili a tutti. Il trattamento solo ai colleghi che ne fanno richiesta e che approvi tu. Nella zona scrivi solo il nome di un paese o di una provincia, mai un indirizzo.</p>
       <button class="btn btn-primary" onclick="publishAnnuncio()">Pubblica annuncio</button>
       <button class="btn btn-ghost" onclick="toggleAnnForm()" style="margin-left:8px;">Annulla</button>
     </div>
@@ -450,6 +454,8 @@
   <section class="panel" id="iscrizione">
     <h2 style="color:var(--petrol-900); font-size:26px; margin-bottom:16px;">Iscriviti alla rete</h2>
 
+    <div class="notice" id="signup-pending" style="display:none; border-left-color:var(--ocher);"></div>
+
     <div class="notice">
       Nome, specializzazioni, area e presentazione sono visibili ai professionisti della rete quando il tuo profilo è Pro. Email e telefono non compaiono mai in chiaro: li vede solo chi usa "Mostra contatti", nei limiti del proprio piano.
     </div>
@@ -459,6 +465,7 @@
     </div>
 
     <div class="notice" id="membership-banner" style="display:none;"></div>
+    <div class="notice" id="albo-status" style="display:none;"></div>
 
     <div class="card">
       <div class="row2">
@@ -496,7 +503,22 @@
         <input type="text" id="in-corsi-altro" placeholder="Es. corso avanzato di terapia manuale...">
       </div>
 
-      <div class="field"><label>Numero di iscrizione all'albo/ordine professionale</label><input type="text" id="in-albo" placeholder="Es. 12345 — Ordine TSRM e PSTRP di Milano"></div>
+      <div class="row2">
+        <div class="field"><label>Albo / Ordine di appartenenza</label>
+          <select id="in-albo-ordine">
+            <option value="">Seleziona...</option>
+            <option value="FNOFI">Ordine dei Fisioterapisti (FNOFI)</option>
+            <option value="OMCeO">Ordine dei Medici Chirurghi e Odontoiatri (OMCeO)</option>
+            <option value="OPI">Ordine delle Professioni Infermieristiche (OPI)</option>
+            <option value="TSRM-PSTRP">Ordine TSRM e PSTRP</option>
+            <option value="Altro">Altro albo o ordine</option>
+          </select>
+        </div>
+        <div class="field"><label>Provincia dell'Ordine</label><input type="text" id="in-albo-prov" placeholder="Es. Napoli"></div>
+      </div>
+      <div class="field"><label>Numero di iscrizione all'albo</label><input type="text" id="in-albo" placeholder="Es. 12345">
+        <p style="font-size:12px; color:var(--ink-soft); margin-top:6px;">Lo controlliamo sul registro pubblico del tuo Ordine. Il numero non compare mai sul sito.</p>
+      </div>
 
       <div class="field"><label>Specializzazioni cliniche (seleziona una o più)</label><div class="chips" id="chips-spec"></div></div>
 
@@ -541,6 +563,7 @@
     <div class="card">
       <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="nome@esempio.it"></div>
       <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="La tua password"></div>
+      <label class="check"><input type="checkbox" id="login-resta" checked> Resta connesso su questo dispositivo</label>
       <button class="btn btn-primary" onclick="login()">Accedi</button>
       <p style="font-size:12.5px; color:var(--ink-soft); margin-top:14px;">Non hai ancora un profilo? <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="switchPanel('iscrizione')">Iscriviti qui</span>.</p>
     </div>
@@ -595,7 +618,32 @@
 const SUPABASE_URL = "https://stljpytjhnpybhwjzblu.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_JXYfCmI6FaSs-8T8MBjePQ_r6OweWMc";
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// "Resta connesso": sessione salvata sul dispositivo (predefinito) oppure solo finché il browser resta aperto
+const REMEMBER_KEY = "pni_resta_connesso";
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+function ssGet(k){ try{ return sessionStorage.getItem(k); }catch(e){ return null; } }
+function ssSet(k, v){ try{ sessionStorage.setItem(k, v); }catch(e){} }
+function ssDel(k){ try{ sessionStorage.removeItem(k); }catch(e){} }
+const authStorage = {
+  getItem: k => { const a = lsGet(k); return a !== null ? a : ssGet(k); },
+  setItem: (k, v) => { if(lsGet(REMEMBER_KEY) === "0"){ ssSet(k, v); lsDel(k); } else { lsSet(k, v); ssDel(k); } },
+  removeItem: k => { lsDel(k); ssDel(k); }
+};
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { storage: authStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+const DUP_MSG = "Esiste già un profilo con questo Ordine, provincia e numero di iscrizione, con questa email o con questo account. Se è il tuo, accedi da 'Accedi'.";
+const ALBO_LABEL = {
+  "FNOFI": "Ordine dei Fisioterapisti (FNOFI)",
+  "OMCeO": "Ordine dei Medici Chirurghi e Odontoiatri (OMCeO)",
+  "OPI": "Ordine delle Professioni Infermieristiche (OPI)",
+  "TSRM-PSTRP": "Ordine TSRM e PSTRP",
+  "Altro": "Altro albo o ordine"
+};
+const ALBO_PER_PROFESSIONE = { "Fisioterapista": "FNOFI", "Medico": "OMCeO", "Infermiere": "OPI" };
 const CONFIGURED = !SUPABASE_URL.startsWith("INCOLLA") && !SUPABASE_ANON_KEY.startsWith("INCOLLA");
 
 /* Link di pagamento Stripe — incolla qui i tuoi due Payment Link */
@@ -681,12 +729,22 @@ async function submitProf(){
   const email = document.getElementById("in-email").value.trim();
   const area = document.getElementById("in-area").value.trim();
   const numeroAlbo = document.getElementById("in-albo").value.trim();
+  const alboOrdine = document.getElementById("in-albo-ordine").value;
+  const alboProv = document.getElementById("in-albo-prov").value.trim();
   const password = document.getElementById("in-password").value;
   const professione = document.getElementById("in-prof").value;
 
-  if(!nome || !email || !area || !numeroAlbo || selectedSpec.size===0){
-    showToast("Compila nome, email, area, numero di iscrizione all'albo e almeno una specializzazione.");
+  if(!nome || !email || !area || !numeroAlbo || !alboOrdine || !alboProv || selectedSpec.size===0){
+    showToast("Compila nome, email, area, Ordine, provincia e numero di iscrizione all'albo e almeno una specializzazione.");
     return;
+  }
+  if(!/^[A-Za-zÀ-ÿ' -]{2,40}$/.test(alboProv)){ showToast("Nella provincia dell'Ordine scrivi solo il nome (es. Napoli)."); return; }
+  if(!/^[A-Za-z0-9\/.-]{1,15}$/.test(numeroAlbo) || !/\d/.test(numeroAlbo)){
+    showToast("Il numero di iscrizione deve contenere cifre (es. 12345), senza spazi."); return;
+  }
+  const alboAtteso = ALBO_PER_PROFESSIONE[professione];
+  if(alboAtteso && alboOrdine !== alboAtteso){
+    showToast("Per la professione scelta l'albo corretto è: " + ALBO_LABEL[alboAtteso] + "."); return;
   }
   if(!editingProfId && (!password || password.length < 6)){
     showToast("Scegli una password di almeno 6 caratteri.");
@@ -700,6 +758,8 @@ async function submitProf(){
     corsi_fisio: professione === "Fisioterapista" ? Array.from(selectedCorsi) : [],
     altre_specializzazioni: (professione !== "Medico" && professione !== "Fisioterapista") ? document.getElementById("in-corsi-altro").value.trim() : null,
     numero_albo: numeroAlbo,
+    albo_ordine: alboOrdine,
+    albo_provincia: alboProv,
     specializzazioni: Array.from(selectedSpec),
     area,
     modalita: document.getElementById("in-mod").value,
@@ -709,9 +769,8 @@ async function submitProf(){
     bio: document.getElementById("in-bio").value.trim()
   };
 
-  const DUP_MSG = "Esiste già un profilo con questo numero di iscrizione all'albo, questa email o questo account. Se è il tuo, accedi da 'Accedi'.";
   if(!editingProfId){
-    const { data: libero } = await sb.rpc("albo_disponibile", { p_albo: numeroAlbo });
+    const { data: libero } = await sb.rpc("albo_disponibile", { p_ordine: alboOrdine, p_provincia: alboProv, p_numero: numeroAlbo });
     if(libero === false){ showToast(DUP_MSG); return; }
   }
 
@@ -740,11 +799,28 @@ async function submitProf(){
     // già loggato (es. account creato in precedenza ma profilo non ancora compilato)
     userId = currentUser.id;
   } else {
-    const { data: authData, error: authError } = await sb.auth.signUp({ email, password });
-    if(authError){ showToast("Errore nella creazione dell'account: " + authError.message); return; }
-    if(!authData.session){ showToast("Account creato: controlla la tua email per confermarlo, poi accedi da 'Accedi' per completare il profilo."); return; }
+    lsSet(REMEMBER_KEY, "1");
+    // i dati del profilo viaggiano con la registrazione: dopo la conferma dell'email il profilo si crea da solo
+    const { data: authData, error: authError } = await sb.auth.signUp({
+      email, password,
+      options: { emailRedirectTo: location.origin + location.pathname, data: { profilo: payload } }
+    });
+    if(authError){
+      showToast(/rate limit/i.test(authError.message) ? "Troppe richieste di email: riprova tra qualche minuto." : "Errore nella creazione dell'account: " + authError.message);
+      return;
+    }
+    if(authData.user && authData.user.identities && authData.user.identities.length === 0){
+      showToast("Esiste già un account con questa email. Accedi da 'Accedi'."); return;
+    }
+    if(!authData.session){
+      resetForm();
+      mostraConfermaPendente(email);
+      showToast("Controlla la tua email e clicca il link di conferma.");
+      return;
+    }
     currentUser = authData.user;
     userId = authData.user.id;
+    sb.auth.updateUser({ data: { profilo: null } });   // la bozza non serve più
   }
 
   payload.user_id = userId;
@@ -758,11 +834,49 @@ async function submitProf(){
   document.getElementById("in-password").value = "";
   await loadOwnProfileIntoForm();
   loadFoundersCounter();
-  const benvenuto = (currentProf && currentProf.founder)
+  showToast(geoWarn ? "Profilo creato." + GEO_MSG : messaggioBenvenuto());
+  switchPanel("iscrizione");
+}
+
+function messaggioBenvenuto(){
+  return (currentProf && currentProf.founder)
     ? "Benvenuto tra i Founders, numero " + currentProf.founder_numero + "! Hai ricerca e contatti illimitati per 12 mesi."
     : "Profilo creato nel piano Free. Attiva la membership Pro per essere visibile ai colleghi.";
-  showToast(geoWarn ? "Profilo creato." + GEO_MSG : benvenuto);
+}
+
+let emailInAttesa = null;
+function mostraConfermaPendente(email){
+  emailInAttesa = email;
+  const el = document.getElementById("signup-pending");
+  el.style.display = "block";
+  el.innerHTML = `📧 <strong>Conferma la tua email.</strong> Abbiamo inviato un messaggio a <strong>${escapeHtml(email)}</strong>: clicca il link per attivare l'account. Il tuo profilo viene creato subito dopo la conferma. Controlla anche la cartella spam. <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="rinviaConferma()">Rinvia l'email</span>`;
   switchPanel("iscrizione");
+}
+
+async function rinviaConferma(){
+  if(!emailInAttesa) return;
+  const { error } = await sb.auth.resend({ type: "signup", email: emailInAttesa, options: { emailRedirectTo: location.origin + location.pathname } });
+  showToast(error ? "Non riesco a rinviare l'email ora: " + error.message : "Email rinviata.");
+}
+
+// dopo la conferma dell'email: crea il profilo dai dati inseriti all'iscrizione
+async function creaProfiloDaMetadata(){
+  if(!currentUser) return false;
+  const bozza = currentUser.user_metadata && currentUser.user_metadata.profilo;
+  if(!bozza) return false;
+  await ensureProfLoaded();
+  if(currentProf){ sb.auth.updateUser({ data: { profilo: null } }); return false; }
+  const campi = ["nome","professione","specializzazione_medica","corsi_fisio","altre_specializzazioni","numero_albo","albo_ordine","albo_provincia","specializzazioni","area","modalita","tipi_paziente","email","telefono","bio","lat","lng"];
+  const riga = { user_id: currentUser.id };
+  campi.forEach(k => { if(bozza[k] !== undefined) riga[k] = bozza[k]; });
+  const { error } = await sb.from("professionisti").insert(riga);
+  await sb.auth.updateUser({ data: { profilo: null } });
+  if(error){
+    showToast(error.code === "23505" ? DUP_MSG : "Il profilo non è stato creato: " + error.message);
+    return false;
+  }
+  currentProf = null; profLoadTried = false;
+  return true;
 }
 
 function resetForm(){
@@ -772,6 +886,8 @@ function resetForm(){
   document.getElementById("in-area").value="";
   document.getElementById("in-bio").value="";
   document.getElementById("in-albo").value="";
+  document.getElementById("in-albo-ordine").value="";
+  document.getElementById("in-albo-prov").value="";
   document.getElementById("in-password").value="";
   document.getElementById("in-corsi-altro").value="";
   selectedSpec.clear(); selectedPaz.clear(); selectedCorsi.clear();
@@ -786,11 +902,24 @@ async function login(){
   const password = document.getElementById("login-password").value;
   if(!email || !password){ showToast("Inserisci email e password."); return; }
 
+  lsSet(REMEMBER_KEY, document.getElementById("login-resta").checked ? "1" : "0");
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  if(error){ showToast("Accesso non riuscito: " + error.message); return; }
+  if(error){
+    if(/not confirmed/i.test(error.message)){
+      mostraConfermaPendente(email);
+      showToast("Devi prima confermare l'email: controlla la posta, anche lo spam.");
+    } else if(/invalid login/i.test(error.message)){
+      showToast("Email o password non corretti.");
+    } else {
+      showToast("Accesso non riuscito: " + error.message);
+    }
+    return;
+  }
   currentUser = data.user;
+  const creato = await creaProfiloDaMetadata();
   await loadOwnProfileIntoForm();
-  showToast("Accesso effettuato.");
+  if(creato) loadFoundersCounter();
+  showToast(creato ? messaggioBenvenuto() : "Accesso effettuato.");
   switchPanel("iscrizione");
 }
 
@@ -808,6 +937,7 @@ async function logout(){
   document.getElementById("btn-logout").style.display = "none";
   document.getElementById("membership-banner").style.display = "none";
   const rbx = document.getElementById("review-links-box"); if(rbx) rbx.style.display = "none";
+  const asx = document.getElementById("albo-status"); if(asx) asx.style.display = "none";
   showToast("Sei uscito dal tuo account.");
   switchPanel("home");
 }
@@ -849,6 +979,7 @@ async function loadOwnProfileIntoForm(){
     document.getElementById("field-password").style.display = "none";
     document.getElementById("membership-banner").style.display = "none";
     const rb = document.getElementById("review-links-box"); if(rb) rb.style.display = "none";
+    const as0 = document.getElementById("albo-status"); if(as0) as0.style.display = "none";
     return;
   }
 
@@ -860,6 +991,13 @@ async function loadOwnProfileIntoForm(){
   document.getElementById("in-nome").value = data.nome || "";
   document.getElementById("in-prof").value = data.professione || "Fisioterapista";
   document.getElementById("in-albo").value = data.numero_albo || "";
+  document.getElementById("in-albo-ordine").value = data.albo_ordine || "";
+  document.getElementById("in-albo-prov").value = data.albo_provincia || "";
+  const as = document.getElementById("albo-status");
+  as.style.display = "block";
+  if(!data.albo_ordine){ as.textContent = "⚠️ Completa i dati dell'albo (Ordine, provincia e numero) e salva: servono per la verifica."; }
+  else if(data.albo_verificato){ as.textContent = "✅ Iscrizione all'albo verificata."; }
+  else { as.textContent = "🔎 Verifica dell'iscrizione all'albo in corso: la controlliamo sul registro pubblico dell'Ordine, di solito entro pochi giorni."; }
   document.getElementById("in-area").value = data.area || "";
   document.getElementById("in-mod").value = data.modalita || "Studio";
   document.getElementById("in-email").value = data.email || "";
@@ -904,7 +1042,7 @@ async function loadResults(){
   if(isMember()) await loadThanksBox(); else { const tb = document.getElementById("thanks-box"); if(tb) tb.innerHTML = ""; }
   resultsEl.innerHTML = '<div class="empty">Caricamento...</div>';
 
-  let query = sb.from("professionisti").select("id,user_id,nome,professione,specializzazione_medica,corsi_fisio,altre_specializzazioni,specializzazioni,area,modalita,tipi_paziente,bio,lat,lng,membership_attiva,created_at").eq("membership_attiva", true).order("created_at", { ascending:false });
+  let query = sb.from("professionisti").select("id,user_id,nome,professione,specializzazione_medica,corsi_fisio,altre_specializzazioni,specializzazioni,area,modalita,tipi_paziente,bio,lat,lng,membership_attiva,albo_ordine,albo_provincia,albo_verificato,created_at").eq("membership_attiva", true).order("created_at", { ascending:false });
 
   const fSpec = document.getElementById("f-spec").value;
   const fArea = document.getElementById("f-area").value.trim();
@@ -958,6 +1096,7 @@ async function loadResults(){
         </div>
         <span class="badge">${escapeHtml(p.modalita)}</span>
       </div>
+      ${alboBadge(p)}
       <div class="tag-row">${(p.specializzazioni||[]).map(s=>`<span class="tag">${escapeHtml(s)}</span>`).join("")}</div>
       ${p.specializzazione_medica ? `<div class="prof-loc">Specializzazione medica: ${escapeHtml(p.specializzazione_medica)}</div>` : ""}
       ${(p.corsi_fisio||[]).length ? `<div class="tag-row">${p.corsi_fisio.map(c=>`<span class="tag">${escapeHtml(c)}</span>`).join("")}</div>` : ""}
@@ -979,6 +1118,12 @@ async function loadResults(){
     `;
     resultsEl.appendChild(card);
   }
+}
+
+function alboBadge(p){
+  if(!p.albo_ordine || !p.albo_verificato) return "";
+  const nome = ALBO_LABEL[p.albo_ordine] || p.albo_ordine;
+  return `<div><span class="albo-badge ok">✓ Iscrizione all'albo verificata</span> <span class="mono" style="font-size:11px; color:var(--ink-soft);">${escapeHtml(nome)}${p.albo_provincia ? " · " + escapeHtml(p.albo_provincia) : ""}</span></div>`;
 }
 
 function renderHands(avg){
@@ -1305,10 +1450,35 @@ function fmtDate(str){
 populateFilterSelect("ann-tipo", TIPI_PAZIENTE);
 populateFilterSelect("ann-trat", ["Terapia manuale", "Rieducazione post-chirurgica", "Riabilitazione neurologica", "Rieducazione posturale", "Fisioterapia sportiva"].concat(CORSI_FISIO));
 
+function modLabel(m){
+  return m === "Domicilio" ? "🏠 Domicilio" : m === "Studio" ? "🏥 Studio" : "↔ Studio o domicilio";
+}
+
+function titoloCase(t){
+  return t.toLowerCase().replace(/(^|[\s'-])([a-zà-ÿ])/g, (m, a, b) => a + b.toUpperCase());
+}
+
+// la zona di un annuncio deve essere il nome di un paese o di una provincia (non una via, un quartiere, un nome)
+async function verificaLocalita(q){
+  const t = q.trim();
+  if(!/^[A-Za-zÀ-ÿ' -]{2,60}$/.test(t)) return { stato: "formato" };
+  try{
+    const r = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&countrycodes=it&accept-language=it&q=" + encodeURIComponent(t));
+    if(!r.ok) return { stato: "errore" };
+    const j = await r.json();
+    if(!j.length) return { stato: "non_trovata" };
+    const tipo = j[0].addresstype || j[0].type;
+    if(!["city","town","village","municipality","hamlet","county"].includes(tipo)) return { stato: "non_valida" };
+    let nome = (j[0].name || (j[0].display_name || "").split(",")[0] || "").trim();
+    if(!/^[A-Za-zÀ-ÿ' -]{2,60}$/.test(nome)) nome = titoloCase(t);
+    return { stato: "ok", nome };
+  }catch(e){ return { stato: "errore" }; }
+}
+
 async function loadHomeAnnunci(){
   const el = document.getElementById("home-annunci-list");
   if(!CONFIGURED){ el.innerHTML = ""; return; }
-  const { data, error } = await sb.from("annunci").select("id,tipo_paziente,zona,created_at").eq("stato","aperto").order("created_at",{ascending:false}).limit(5);
+  const { data, error } = await sb.from("annunci").select("id,tipo_paziente,zona,modalita,created_at").eq("stato","aperto").order("created_at",{ascending:false}).limit(5);
   if(error || !data || data.length === 0){
     el.innerHTML = '<div style="padding:14px 0; font-size:13px; color:var(--ink-soft); border-top:1px solid var(--line);">Nessun annuncio pubblicato per ora.</div>';
     return;
@@ -1317,7 +1487,7 @@ async function loadHomeAnnunci(){
     <div class="ann-mini" onclick="switchPanel('annunci')">
       <div>
         <div class="t">${escapeHtml(a.tipo_paziente)}</div>
-        <div class="z">📍 ${escapeHtml(a.zona)}</div>
+        <div class="z">📍 ${escapeHtml(a.zona)}${a.modalita ? " · " + modLabel(a.modalita) : ""}</div>
       </div>
       <div class="d mono">${fmtDate(a.created_at)}</div>
     </div>`).join("");
@@ -1333,15 +1503,22 @@ function toggleAnnForm(){
 async function publishAnnuncio(){
   if(!isMember()){ showToast("Serve una membership attiva per pubblicare annunci."); return; }
   const tipo = document.getElementById("ann-tipo").value;
-  const zona = document.getElementById("ann-zona").value.trim();
+  const zonaIn = document.getElementById("ann-zona").value.trim();
   const modalita = document.getElementById("ann-mod").value;
   const trattamento = document.getElementById("ann-trat").value || null;
-  if(!tipo || !zona || !modalita){ showToast("Compila tipo di paziente, zona e se è a studio o a domicilio."); return; }
+  if(!tipo || !zonaIn || !modalita){ showToast("Compila tipo di paziente, paese o provincia e se è a studio o a domicilio."); return; }
 
-  const { data: ann, error } = await sb.from("annunci").insert({ user_id: currentUser.id, tipo_paziente: tipo, zona }).select().single();
+  showToast("Controllo la località...");
+  const vz = await verificaLocalita(zonaIn);
+  if(vz.stato === "formato"){ showToast("Nella zona scrivi solo il nome di un paese o di una provincia, con sole lettere: niente indirizzi né numeri."); return; }
+  if(vz.stato === "non_trovata"){ showToast("Non trovo questa località: scrivi il nome di un paese o di una provincia."); return; }
+  if(vz.stato === "non_valida"){ showToast("Indica un paese o una provincia, non una via, un quartiere o una regione."); return; }
+  const zona = vz.stato === "ok" ? vz.nome : titoloCase(zonaIn);   // se il servizio di controllo non risponde, uso il testo scritto
+
+  const { data: ann, error } = await sb.from("annunci").insert({ user_id: currentUser.id, tipo_paziente: tipo, zona, modalita }).select().single();
   if(error){ showToast("Errore nella pubblicazione: " + error.message); return; }
 
-  const { error: e2 } = await sb.from("annunci_dettagli").insert({ annuncio_id: ann.id, user_id: currentUser.id, modalita, trattamento });
+  const { error: e2 } = await sb.from("annunci_dettagli").insert({ annuncio_id: ann.id, user_id: currentUser.id, trattamento });
   if(e2){
     await sb.from("annunci").delete().eq("id", ann.id);
     showToast("Errore nel salvataggio dei dati: " + e2.message);
@@ -1360,7 +1537,7 @@ async function publishAnnuncio(){
 
 function annDetailHtml(d){
   if(!d) return "";
-  return `<div class="ann-detail"><strong>Modalità:</strong> ${escapeHtml(d.modalita || "—")}<br><strong>Trattamento:</strong> ${escapeHtml(d.trattamento || "Nessuno in particolare")}</div>`;
+  return `<div class="ann-detail"><strong>Trattamento:</strong> ${escapeHtml(d.trattamento || "Nessuno in particolare")}</div>`;
 }
 
 async function loadAnnunci(){
@@ -1385,7 +1562,7 @@ async function loadAnnunci(){
     const ids = list.map(a => a.id);
     const { data: mie } = await sb.from("annunci_richieste").select("annuncio_id,stato").eq("richiedente_id", currentUser.id).in("annuncio_id", ids);
     (mie || []).forEach(r => { richiesteMap[r.annuncio_id] = r.stato; });
-    const { data: det } = await sb.from("annunci_dettagli").select("annuncio_id,modalita,trattamento").in("annuncio_id", ids);
+    const { data: det } = await sb.from("annunci_dettagli").select("annuncio_id,trattamento").in("annuncio_id", ids);
     (det || []).forEach(d => { detailsMap[d.annuncio_id] = d; });
     const { data: ctc } = await sb.rpc("contatti_annunci_approvati");
     (ctc || []).forEach(c => { authorsMap[c.annuncio] = c; });
@@ -1437,6 +1614,7 @@ async function loadAnnunci(){
     return `<div class="ann-card">
       <div class="ann-tipo">${escapeHtml(a.tipo_paziente)}</div>
       <div class="ann-zona">📍 ${escapeHtml(a.zona)}</div>
+      ${a.modalita ? `<div class="ann-zona">${modLabel(a.modalita)}</div>` : ""}
       <div class="ann-date mono">${fmtDate(a.created_at)}</div>
       ${action}
     </div>`;
@@ -1559,7 +1737,13 @@ async function submitConfirm(){
       const { data: sessionData } = await sb.auth.getSession();
       if(sessionData && sessionData.session){
         currentUser = sessionData.session.user;
+        const creato = await creaProfiloDaMetadata();
         await loadOwnProfileIntoForm();
+        if(creato){
+          loadFoundersCounter();
+          showToast("Email confermata. " + messaggioBenvenuto());
+          switchPanel("iscrizione");
+        }
       }
     }
   }

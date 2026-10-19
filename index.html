@@ -411,13 +411,13 @@
 
   <section class="panel" id="annunci">
     <h2 style="color:var(--petrol-900); font-size:26px; margin-bottom:6px;">Annunci</h2>
-    <p style="color:var(--ink-soft); font-size:14px; margin-bottom:16px;">Qui compaiono solo il tipo di paziente e la zona. Iniziali del paziente e specializzazione richiesta li vede solo chi è socio con membership attiva e ne fa richiesta, dopo la tua approvazione.</p>
+    <p style="color:var(--ink-soft); font-size:14px; margin-bottom:16px;">Qui compaiono solo il tipo di paziente e la zona. Modalità (studio o domicilio) ed eventuale trattamento li vede solo chi è socio e ne fa richiesta, dopo la tua approvazione.</p>
 
     <button class="btn btn-primary" onclick="toggleAnnForm()" style="margin-bottom:16px;">Pubblica un annuncio</button>
 
     <div class="card" id="ann-form" style="display:none; margin-bottom:20px;">
       <div class="notice error">
-        Inserisci solo i dati richiesti qui sotto. Del paziente indica soltanto le iniziali (es. M.R.): nessun nome, contatto o altro dato personale o sanitario.
+        Non inserire nome, cognome o altri dati del paziente. Indica solo tipo di paziente, zona, se la prestazione è a studio o a domicilio ed eventuale trattamento.
       </div>
       <div class="row2">
         <div class="field"><label>Tipo di paziente</label>
@@ -426,12 +426,19 @@
         <div class="field"><label>Zona richiesta</label><input type="text" id="ann-zona" placeholder="Es. Napoli, Vomero"></div>
       </div>
       <div class="row2">
-        <div class="field"><label>Iniziali del paziente</label><input type="text" id="ann-iniz" maxlength="8" placeholder="Es. M.R."></div>
-        <div class="field"><label>Specializzazione richiesta</label>
-          <select id="ann-spec"><option value="">Seleziona...</option></select>
+        <div class="field"><label>Studio o domicilio</label>
+          <select id="ann-mod">
+            <option value="">Seleziona...</option>
+            <option value="Studio">Studio</option>
+            <option value="Domicilio">Domicilio</option>
+            <option value="Indifferente">Indifferente</option>
+          </select>
+        </div>
+        <div class="field"><label>Trattamento (facoltativo)</label>
+          <select id="ann-trat"><option value="">Nessuno in particolare</option></select>
         </div>
       </div>
-      <p style="font-size:12px; color:var(--ink-soft); margin:-4px 0 14px;">Iniziali e specializzazione sono visibili solo ai colleghi che ne fanno richiesta e che approvi tu.</p>
+      <p style="font-size:12px; color:var(--ink-soft); margin:-4px 0 14px;">Modalità e trattamento sono visibili solo ai colleghi che ne fanno richiesta e che approvi tu. Nella zona scrivi solo città o quartiere, mai un indirizzo.</p>
       <button class="btn btn-primary" onclick="publishAnnuncio()">Pubblica annuncio</button>
       <button class="btn btn-ghost" onclick="toggleAnnForm()" style="margin-left:8px;">Annulla</button>
     </div>
@@ -1296,7 +1303,7 @@ function fmtDate(str){
   try{ return new Date(str).toLocaleDateString("it-IT", { day:"numeric", month:"short" }); }catch(e){ return ""; }
 }
 populateFilterSelect("ann-tipo", TIPI_PAZIENTE);
-populateFilterSelect("ann-spec", SPECIALIZZAZIONI);
+populateFilterSelect("ann-trat", ["Terapia manuale", "Rieducazione post-chirurgica", "Riabilitazione neurologica", "Rieducazione posturale", "Fisioterapia sportiva"].concat(CORSI_FISIO));
 
 async function loadHomeAnnunci(){
   const el = document.getElementById("home-annunci-list");
@@ -1327,16 +1334,14 @@ async function publishAnnuncio(){
   if(!isMember()){ showToast("Serve una membership attiva per pubblicare annunci."); return; }
   const tipo = document.getElementById("ann-tipo").value;
   const zona = document.getElementById("ann-zona").value.trim();
-  const rawIniz = document.getElementById("ann-iniz").value.replace(/[\s.]/g, "");
-  const spec = document.getElementById("ann-spec").value;
-  if(!tipo || !zona || !rawIniz || !spec){ showToast("Compila tipo di paziente, zona, iniziali e specializzazione richiesta."); return; }
-  if(!/^[A-Za-zÀ-ÿ]{1,3}$/.test(rawIniz)){ showToast("Scrivi solo le iniziali del paziente: da 1 a 3 lettere (es. M.R.), senza altri dati."); return; }
-  const iniziali = rawIniz.toUpperCase().split("").join(".") + ".";
+  const modalita = document.getElementById("ann-mod").value;
+  const trattamento = document.getElementById("ann-trat").value || null;
+  if(!tipo || !zona || !modalita){ showToast("Compila tipo di paziente, zona e se è a studio o a domicilio."); return; }
 
   const { data: ann, error } = await sb.from("annunci").insert({ user_id: currentUser.id, tipo_paziente: tipo, zona }).select().single();
   if(error){ showToast("Errore nella pubblicazione: " + error.message); return; }
 
-  const { error: e2 } = await sb.from("annunci_dettagli").insert({ annuncio_id: ann.id, user_id: currentUser.id, iniziali, specializzazione_richiesta: spec });
+  const { error: e2 } = await sb.from("annunci_dettagli").insert({ annuncio_id: ann.id, user_id: currentUser.id, modalita, trattamento });
   if(e2){
     await sb.from("annunci").delete().eq("id", ann.id);
     showToast("Errore nel salvataggio dei dati: " + e2.message);
@@ -1345,8 +1350,8 @@ async function publishAnnuncio(){
 
   document.getElementById("ann-tipo").value = "";
   document.getElementById("ann-zona").value = "";
-  document.getElementById("ann-iniz").value = "";
-  document.getElementById("ann-spec").value = "";
+  document.getElementById("ann-mod").value = "";
+  document.getElementById("ann-trat").value = "";
   document.getElementById("ann-form").style.display = "none";
   showToast("Annuncio pubblicato.");
   loadAnnunci();
@@ -1355,7 +1360,7 @@ async function publishAnnuncio(){
 
 function annDetailHtml(d){
   if(!d) return "";
-  return `<div class="ann-detail"><strong>Iniziali paziente:</strong> ${escapeHtml(d.iniziali || "—")}<br><strong>Specializzazione richiesta:</strong> ${escapeHtml(d.specializzazione_richiesta || "—")}</div>`;
+  return `<div class="ann-detail"><strong>Modalità:</strong> ${escapeHtml(d.modalita || "—")}<br><strong>Trattamento:</strong> ${escapeHtml(d.trattamento || "Nessuno in particolare")}</div>`;
 }
 
 async function loadAnnunci(){
@@ -1380,7 +1385,7 @@ async function loadAnnunci(){
     const ids = list.map(a => a.id);
     const { data: mie } = await sb.from("annunci_richieste").select("annuncio_id,stato").eq("richiedente_id", currentUser.id).in("annuncio_id", ids);
     (mie || []).forEach(r => { richiesteMap[r.annuncio_id] = r.stato; });
-    const { data: det } = await sb.from("annunci_dettagli").select("annuncio_id,iniziali,specializzazione_richiesta").in("annuncio_id", ids);
+    const { data: det } = await sb.from("annunci_dettagli").select("annuncio_id,modalita,trattamento").in("annuncio_id", ids);
     (det || []).forEach(d => { detailsMap[d.annuncio_id] = d; });
     const { data: ctc } = await sb.rpc("contatti_annunci_approvati");
     (ctc || []).forEach(c => { authorsMap[c.annuncio] = c; });

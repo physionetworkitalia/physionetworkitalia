@@ -216,6 +216,42 @@
   .leaflet-popup-content strong{ color:var(--petrol-900); }
   @media(max-width:640px){ .map-box{ height:300px; } }
 
+  /* piani e Founders */
+  .plans{ margin-top:48px; }
+  .plans-head{ text-align:center; max-width:640px; margin:0 auto 24px; }
+  .plans-title{ font-size:clamp(24px,5vw,32px); color:var(--petrol-900); margin:6px 0 8px; }
+  .plans-head p{ font-size:15px; color:var(--ink-soft); line-height:1.55; max-width:none; margin-top:0; }
+  .plan-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; align-items:stretch; }
+  @media(max-width:820px){ .plan-grid{ grid-template-columns:1fr; gap:22px; } }
+  .plan{ position:relative; background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 18px 18px; display:flex; flex-direction:column; gap:10px; }
+  .plan h4{ font-family:'Fraunces',serif; font-size:21px; color:var(--petrol-900); margin:0; }
+  .plan-price{ font-family:'Fraunces',serif; font-size:30px; color:var(--petrol-900); line-height:1; }
+  .plan-price small{ font-family:'IBM Plex Sans',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-left:4px; }
+  .plan-list{ list-style:none; padding:0; margin:6px 0; display:flex; flex-direction:column; gap:8px; font-size:13.5px; line-height:1.4; flex:1; }
+  .plan-list li{ padding-left:24px; position:relative; }
+  .plan-list li::before{ position:absolute; left:0; top:0; font-weight:700; }
+  .plan-list li.yes::before{ content:"✓"; color:var(--sage); }
+  .plan-list li.no{ color:var(--ink-soft); }
+  .plan-list li.no::before{ content:"✕"; color:#C0453A; }
+  .plans .plan-note{ font-size:12px; color:var(--ink-soft); margin:0; line-height:1.4; max-width:none; }
+  .plan .btn{ width:100%; }
+  .plan-founder{ border:2px solid var(--ocher); box-shadow:0 8px 28px rgba(255,106,77,0.16); }
+  .plan-pro{ background:var(--petrol-900); color:#fff; border-color:var(--petrol-900); box-shadow:0 10px 30px rgba(36,30,78,0.3); }
+  .plan-pro h4, .plan-pro .plan-price{ color:#fff; }
+  .plan-pro .plan-price small, .plan-pro .plan-note{ color:rgba(255,255,255,0.78); }
+  .plan-pro .plan-list li.yes::before{ color:#7CF0D8; }
+  .plan-ribbon{ position:absolute; top:-11px; left:18px; background:var(--ocher); color:var(--petrol-900); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:4px 10px; border-radius:999px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
+  .plan-ribbon.pro{ background:#7CF0D8; }
+  .founders-meter{ display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--ink-soft); }
+  .founders-bar{ height:8px; border-radius:999px; background:var(--paper-dim); overflow:hidden; }
+  .founders-bar span{ display:block; height:100%; width:0; background:linear-gradient(90deg,var(--ocher),#FFB84D); transition:width .6s; }
+  .plans .plans-foot{ text-align:center; margin:22px auto 0; font-family:'Fraunces',serif; font-size:19px; color:var(--petrol-900); max-width:640px; line-height:1.35; }
+  .plan.esaurito .btn{ opacity:.55; pointer-events:none; }
+  .quota-bar{ background:#fff; border:1px solid var(--line); border-left:4px solid var(--sage); border-radius:10px; padding:10px 14px; font-size:13px; margin-bottom:12px; line-height:1.5; }
+  .quota-bar.founder{ border-left-color:var(--ocher); }
+  .quota-bar.free{ border-left-color:#C0453A; }
+  .hero-banner .hero-link{ color:#fff; text-decoration:underline; cursor:pointer; font-size:14px; align-self:center; }
+
   .toast{
     position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
     background:var(--petrol-900); color:var(--paper); padding:12px 20px; border-radius:8px;
@@ -251,6 +287,7 @@
           <div class="hero-cta">
             <button class="btn btn-primary" onclick="switchPanel('cerca')">Trova un professionista</button>
             <button class="btn btn-ghost" onclick="switchPanel('iscrizione')">Iscriviti alla rete</button>
+            <span class="hero-link" onclick="document.getElementById('piani').scrollIntoView({behavior:'smooth'})">Scopri i piani →</span>
           </div>
         </div>
         <div class="hero-ann">
@@ -270,6 +307,60 @@
         <div class="step"><div class="num mono">03</div><p class="step-text">Un collega può trovarti nella rete in base alle tue caratteristiche e localizzazione.</p></div>
       </div>
 
+      <div class="plans" id="piani">
+        <div class="plans-head">
+          <span class="eyebrow">Come entrare nella rete</span>
+          <h3 class="plans-title">Scegli il tuo posto nella rete.</h3>
+          <p>I primi 100 professionisti entrano gratis come <strong>Founders</strong>. Per essere trovato dai colleghi e ricevere pazienti serve la membership Pro.</p>
+        </div>
+        <div class="plan-grid">
+          <div class="plan plan-founder" id="founders-card">
+            <div class="plan-ribbon">Lancio · primi 100</div>
+            <h4>Founders 100</h4>
+            <div class="plan-price">Gratis <small>per i primi 100 iscritti</small></div>
+            <div class="founders-meter">
+              <div class="founders-bar"><span id="founders-bar-fill"></span></div>
+              <span class="mono">Posti rimasti: <strong class="founders-left">—</strong> su 100</span>
+            </div>
+            <ul class="plan-list">
+              <li class="yes">Ricerca illimitata dei colleghi con membership attiva</li>
+              <li class="yes">Contatti illimitati verso i professionisti Pro, per 12 mesi dalla registrazione</li>
+              <li class="no">Nessuna visibilità nei risultati di ricerca finché non attivi la membership</li>
+              <li class="no">Nessuna richiesta di collaborazione ricevuta finché resti Free</li>
+            </ul>
+            <p class="plan-note">Un vantaggio di lancio sull'uso gratuito della piattaforma: non è una membership Pro gratuita.</p>
+            <button class="btn btn-primary" id="founders-cta" onclick="switchPanel('iscrizione')">Prenota il tuo posto gratis</button>
+          </div>
+
+          <div class="plan plan-pro">
+            <div class="plan-ribbon pro">Consigliato</div>
+            <h4>Membership Pro</h4>
+            <div class="plan-price">100 € <small>all'anno</small></div>
+            <ul class="plan-list">
+              <li class="yes">Profilo visibile e ricercabile da tutti i professionisti della rete</li>
+              <li class="yes">Ricevi richieste di collaborazione e segnalazioni di pazienti</li>
+              <li class="yes">Ricerca e contatti illimitati</li>
+              <li class="yes">Bacheca annunci, mappa entro 30 km, recensioni dei pazienti e ringraziamenti</li>
+            </ul>
+            <p class="plan-note">Per essere trovato e ricevere pazienti dai colleghi.</p>
+            <button class="btn btn-primary" onclick="switchPanel('iscrizione')">Diventa Pro</button>
+          </div>
+
+          <div class="plan plan-free">
+            <h4>Free</h4>
+            <div class="plan-price">0 € <small>dopo i primi 100</small></div>
+            <ul class="plan-list">
+              <li class="yes">Cerchi e contatti fino a 3 professionisti al mese</li>
+              <li class="no">Non compari nella ricerca</li>
+              <li class="no">I colleghi non possono contattarti</li>
+            </ul>
+            <p class="plan-note">Per provare la rete prima di decidere.</p>
+            <button class="btn btn-ghost" onclick="switchPanel('iscrizione')">Iscriviti</button>
+          </div>
+        </div>
+        <p class="plans-foot">Nella rete i colleghi cercano i professionisti Pro. Se non sei Pro, per loro non esisti: attiva la membership e fatti trovare.</p>
+      </div>
+
     </div>
   </section>
 
@@ -279,6 +370,8 @@
 
     <div id="search-gate" style="display:none;"></div>
     <div id="search-tools">
+    <div id="quota-box"></div>
+    <div id="thanks-box"></div>
     <div class="geo-box">
       <div class="geo-row">
         <input type="text" id="geo-q" placeholder="Cerca vicino a: città o indirizzo">
@@ -318,13 +411,13 @@
 
   <section class="panel" id="annunci">
     <h2 style="color:var(--petrol-900); font-size:26px; margin-bottom:6px;">Annunci</h2>
-    <p style="color:var(--ink-soft); font-size:14px; margin-bottom:16px;">Qui compaiono solo il tipo di paziente e la zona. I dettagli completi li vede chi è iscritto con membership attiva e ne fa richiesta, dopo l'approvazione di chi ha pubblicato.</p>
+    <p style="color:var(--ink-soft); font-size:14px; margin-bottom:16px;">Qui compaiono solo il tipo di paziente e la zona. Iniziali del paziente e specializzazione richiesta li vede solo chi è socio con membership attiva e ne fa richiesta, dopo la tua approvazione.</p>
 
     <button class="btn btn-primary" onclick="toggleAnnForm()" style="margin-bottom:16px;">Pubblica un annuncio</button>
 
     <div class="card" id="ann-form" style="display:none; margin-bottom:20px;">
       <div class="notice error">
-        Non inserire nome, cognome, contatti o altri dati che identificano il paziente: i dati sanitari sono tutelati dal GDPR. Descrivi solo il quadro clinico in modo anonimo.
+        Inserisci solo i dati richiesti qui sotto. Del paziente indica soltanto le iniziali (es. M.R.): nessun nome, contatto o altro dato personale o sanitario.
       </div>
       <div class="row2">
         <div class="field"><label>Tipo di paziente</label>
@@ -332,9 +425,13 @@
         </div>
         <div class="field"><label>Zona richiesta</label><input type="text" id="ann-zona" placeholder="Es. Napoli, Vomero"></div>
       </div>
-      <div class="field"><label>Dettagli (visibili solo ai colleghi approvati da te)</label>
-        <textarea id="ann-dettagli" placeholder="Quadro clinico in forma anonima, tempistiche, modalità (studio/domicilio), eventuali note..."></textarea>
+      <div class="row2">
+        <div class="field"><label>Iniziali del paziente</label><input type="text" id="ann-iniz" maxlength="8" placeholder="Es. M.R."></div>
+        <div class="field"><label>Specializzazione richiesta</label>
+          <select id="ann-spec"><option value="">Seleziona...</option></select>
+        </div>
       </div>
+      <p style="font-size:12px; color:var(--ink-soft); margin:-4px 0 14px;">Iniziali e specializzazione sono visibili solo ai colleghi che ne fanno richiesta e che approvi tu.</p>
       <button class="btn btn-primary" onclick="publishAnnuncio()">Pubblica annuncio</button>
       <button class="btn btn-ghost" onclick="toggleAnnForm()" style="margin-left:8px;">Annulla</button>
     </div>
@@ -347,11 +444,11 @@
     <h2 style="color:var(--petrol-900); font-size:26px; margin-bottom:16px;">Iscriviti alla rete</h2>
 
     <div class="notice">
-      I dati inseriti qui sono visibili a tutti i professionisti che consultano questa directory. Non inserire informazioni che non vuoi condividere pubblicamente.
+      Nome, specializzazioni, area e presentazione sono visibili ai professionisti della rete quando il tuo profilo è Pro. Email e telefono non compaiono mai in chiaro: li vede solo chi usa "Mostra contatti", nei limiti del proprio piano.
     </div>
 
     <div class="notice" style="border-left-color:var(--petrol-700); background:rgba(23,92,92,0.08);">
-      <strong style="color:var(--petrol-900);">Costo di accesso alla rete:</strong> per essere trovato dai colleghi e consultare il database serve una membership attiva — <strong>10 € al mese</strong> oppure <strong>100 € all'anno</strong> (due mesi gratis rispetto al mensile). Il profilo si crea gratuitamente qui sotto; il pagamento si attiva subito dopo, dal tuo account.
+      <strong style="color:var(--petrol-900);">Registrazione gratuita.</strong> I primi 100 iscritti sono <strong>Founders</strong>: ricerca e contatti illimitati per 12 mesi (posti rimasti: <strong class="founders-left">—</strong>). Per essere visibile ai colleghi e ricevere richieste serve la <strong>membership Pro, 100 € all'anno</strong>, che attivi dal tuo profilo dopo l'iscrizione.
     </div>
 
     <div class="notice" id="membership-banner" style="display:none;"></div>
@@ -421,6 +518,14 @@
 
       <button class="btn btn-primary" id="btn-submit-prof" onclick="submitProf()">Crea il mio profilo</button>
       <button class="btn btn-ghost" id="btn-logout" style="display:none; margin-left:10px;" onclick="logout()">Esci dal mio account</button>
+    </div>
+
+    <div class="card" id="review-links-box" style="display:none; margin-top:16px;">
+      <h3 style="font-size:18px; color:var(--petrol-900);">Link per le recensioni dei tuoi pazienti</h3>
+      <p style="font-size:13px; color:var(--ink-soft); margin:6px 0 12px; line-height:1.5;">Genera un link e mandalo a un paziente: può lasciare una sola recensione e poi il link smette di funzionare. Ogni link è per un solo paziente.</p>
+      <button class="btn btn-primary btn-small" onclick="generaLinkRecensione()">Genera link monouso</button>
+      <button class="btn btn-ghost btn-small" onclick="annullaLinkRecensione()" style="margin-left:8px;">Annulla i link non usati</button>
+      <p class="mono" id="review-links-pending" style="font-size:12px; color:var(--ink-soft); margin-top:12px;"></p>
     </div>
   </section>
 
@@ -597,6 +702,12 @@ async function submitProf(){
     bio: document.getElementById("in-bio").value.trim()
   };
 
+  const DUP_MSG = "Esiste già un profilo con questo numero di iscrizione all'albo, questa email o questo account. Se è il tuo, accedi da 'Accedi'.";
+  if(!editingProfId){
+    const { data: libero } = await sb.rpc("albo_disponibile", { p_albo: numeroAlbo });
+    if(libero === false){ showToast(DUP_MSG); return; }
+  }
+
   // posizione sulla mappa, ricavata dall'area geografica (arrotondata a circa 1 km)
   let geoWarn = false;
   const serveGeo = !(editingProfId && currentProf && currentProf.area === area && currentProf.lat != null);
@@ -610,7 +721,7 @@ async function submitProf(){
 
   if(editingProfId){
     const { error } = await sb.from("professionisti").update(payload).eq("id", editingProfId);
-    if(error){ showToast("Errore nel salvataggio: " + error.message); return; }
+    if(error){ showToast(error.code === "23505" ? DUP_MSG : "Errore nel salvataggio: " + error.message); return; }
     currentProf = Object.assign({}, currentProf, payload);
     showToast(geoWarn ? "Profilo aggiornato." + GEO_MSG : "Profilo aggiornato.");
     switchPanel("cerca");
@@ -633,13 +744,17 @@ async function submitProf(){
   const { error } = await sb.from("professionisti").insert(payload);
   if(error){
     console.error(error);
-    showToast("Errore nel salvataggio profilo: " + error.message);
+    showToast(error.code === "23505" ? DUP_MSG : "Errore nel salvataggio profilo: " + error.message);
     return;
   }
 
-  showToast(geoWarn ? "Profilo creato." + GEO_MSG : "Profilo creato. Attiva la membership per comparire nella ricerca.");
   document.getElementById("in-password").value = "";
   await loadOwnProfileIntoForm();
+  loadFoundersCounter();
+  const benvenuto = (currentProf && currentProf.founder)
+    ? "Benvenuto tra i Founders, numero " + currentProf.founder_numero + "! Hai ricerca e contatti illimitati per 12 mesi."
+    : "Profilo creato nel piano Free. Attiva la membership Pro per essere visibile ai colleghi.";
+  showToast(geoWarn ? "Profilo creato." + GEO_MSG : benvenuto);
   switchPanel("iscrizione");
 }
 
@@ -685,13 +800,37 @@ async function logout(){
   document.getElementById("btn-submit-prof").textContent = "Crea il mio profilo";
   document.getElementById("btn-logout").style.display = "none";
   document.getElementById("membership-banner").style.display = "none";
+  const rbx = document.getElementById("review-links-box"); if(rbx) rbx.style.display = "none";
   showToast("Sei uscito dal tuo account.");
   switchPanel("home");
 }
 
+function renderPlanBanner(banner, d){
+  const ricontrolla = ` <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="refreshMembership()">Ricontrolla lo stato</span>.`;
+  const founderOn = d.founder && d.founder_fino && new Date(d.founder_fino) > new Date();
+  banner.classList.remove("error");
+  if(d.membership_attiva){
+    const fino = d.membership_scadenza ? " Periodo in corso fino al " + dataIt(d.membership_scadenza) + "." : "";
+    banner.textContent = "✅ Membership Pro attiva: il tuo profilo è visibile e puoi ricevere richieste di collaborazione e segnalazioni." + fino;
+    return;
+  }
+  banner.classList.add("error");
+  let testo;
+  if(founderOn){
+    testo = `🎖️ <strong>Sei Founder n. ${d.founder_numero}</strong>: ricerca e contatti illimitati verso i professionisti Pro fino al ${dataIt(d.founder_fino)}. Finché non attivi la membership Pro il tuo profilo <strong>non è visibile</strong> nella ricerca e non puoi ricevere richieste di collaborazione.`;
+  } else if(d.founder){
+    testo = `Il vantaggio Founders è terminato il ${dataIt(d.founder_fino)}. Ora sei nel piano Free: puoi cercare e contattare fino a 3 professionisti al mese e il tuo profilo <strong>non è visibile</strong> ai colleghi.`;
+  } else {
+    testo = `Sei nel piano <strong>Free</strong>: puoi cercare e contattare fino a 3 professionisti al mese. Il tuo profilo <strong>non è visibile</strong> ai colleghi e non puoi ricevere richieste di collaborazione.`;
+  }
+  banner.innerHTML = `${testo}<br><br>${proBtnHtml(false)}
+    <p style="font-size:11.5px; margin-top:10px; color:var(--ink-soft);">Dopo il pagamento la membership Pro si attiva in automatico, di solito entro un minuto.${ricontrolla}</p>`;
+}
+
 async function loadOwnProfileIntoForm(){
   if(!currentUser) return;
-  const { data, error } = await sb.from("professionisti").select("*").eq("user_id", currentUser.id).maybeSingle();
+  const { data: righe, error } = await sb.rpc("mio_profilo");
+  const data = (righe && righe.length) ? righe[0] : null;
   document.getElementById("field-password").style.display = "none";
   document.getElementById("btn-submit-prof").textContent = "Salva modifiche";
   document.getElementById("btn-logout").style.display = "inline-block";
@@ -702,26 +841,15 @@ async function loadOwnProfileIntoForm(){
     document.getElementById("btn-submit-prof").textContent = "Crea il mio profilo";
     document.getElementById("field-password").style.display = "none";
     document.getElementById("membership-banner").style.display = "none";
+    const rb = document.getElementById("review-links-box"); if(rb) rb.style.display = "none";
     return;
   }
 
   editingProfId = data.id;
+  refreshReviewLinksBox();
   const banner = document.getElementById("membership-banner");
   banner.style.display = "block";
-  if(data.membership_attiva){
-    banner.classList.remove("error");
-    banner.textContent = "✅ La tua membership è attiva: il tuo profilo è visibile nella ricerca.";
-  } else {
-    banner.classList.add("error");
-    const linkMensile = STRIPE_LINK_MENSILE + "?prefilled_email=" + encodeURIComponent(data.email || "");
-    const linkAnnuale = STRIPE_LINK_ANNUALE + "?prefilled_email=" + encodeURIComponent(data.email || "");
-    banner.innerHTML = `
-      ⚠️ Membership non attiva: il tuo profilo esiste ma <strong>non compare</strong> nella ricerca finché non attivi la membership.<br><br>
-      <a href="${linkMensile}" target="_blank" class="btn btn-primary" style="text-decoration:none; display:inline-block; margin-right:10px;">Attiva mensile — 10 €/mese</a>
-      <a href="${linkAnnuale}" target="_blank" class="btn btn-ghost" style="text-decoration:none; display:inline-block;">Attiva annuale — 100 €/anno</a>
-      <p style="font-size:11.5px; margin-top:10px; color:var(--ink-soft);">Dopo il pagamento l'attivazione richiede una breve verifica manuale prima di comparire nella ricerca.</p>
-    `;
-  }
+  renderPlanBanner(banner, data);
   document.getElementById("in-nome").value = data.nome || "";
   document.getElementById("in-prof").value = data.professione || "Fisioterapista";
   document.getElementById("in-albo").value = data.numero_albo || "";
@@ -757,7 +885,7 @@ async function loadResults(){
   await ensureProfLoaded();
   const gate = document.getElementById("search-gate");
   const tools = document.getElementById("search-tools");
-  if(!isMember()){
+  if(!currentProf){
     tools.style.display = "none";
     gate.style.display = "block";
     gate.innerHTML = gateHtml();
@@ -765,9 +893,11 @@ async function loadResults(){
   }
   tools.style.display = "block";
   gate.style.display = "none";
+  await renderQuotaBox();
+  if(isMember()) await loadThanksBox(); else { const tb = document.getElementById("thanks-box"); if(tb) tb.innerHTML = ""; }
   resultsEl.innerHTML = '<div class="empty">Caricamento...</div>';
 
-  let query = sb.from("professionisti").select("*").eq("membership_attiva", true).order("created_at", { ascending:false });
+  let query = sb.from("professionisti").select("id,user_id,nome,professione,specializzazione_medica,corsi_fisio,altre_specializzazioni,specializzazioni,area,modalita,tipi_paziente,bio,lat,lng,membership_attiva,created_at").eq("membership_attiva", true).order("created_at", { ascending:false });
 
   const fSpec = document.getElementById("f-spec").value;
   const fArea = document.getElementById("f-area").value.trim();
@@ -834,10 +964,9 @@ async function loadResults(){
         <span class="mono">✅ ${stats.confermateCount} prestazion${stats.confermateCount===1?"e":"i"} confermat${stats.confermateCount===1?"a":"e"} dai pazienti</span>
       </div>
       <div class="prof-actions">
-        <a href="mailto:${encodeURIComponent(p.email)}">Scrivi via email</a>
-        ${p.telefono ? `<a href="tel:${encodeURIComponent(p.telefono)}">Chiama</a>` : ""}
-        <button class="thanks-btn" onclick="submitThanks('${p.id}', this)">🙏 Ringrazia</button>
-        <button class="link-btn" onclick="copyReviewLink('${p.id}')">Copia link recensioni per il paziente</button>
+        ${currentUser && p.user_id === currentUser.id
+          ? '<span class="mono">Il tuo profilo</span>'
+          : `<span id="slot-${p.id}"><button class="btn btn-primary btn-small" onclick="mostraContatti('${p.id}')">Mostra contatti</button></span>`}
         <button class="link-btn" onclick="creaSegnalazione('${p.id}', '${escapeHtml(p.nome).replace(/'/g,"\\'")}')">Segnala un paziente a questo collega</button>
       </div>
     `;
@@ -854,48 +983,84 @@ function renderHands(avg){
 
 async function getProfStats(profId){
   const { data: reviews } = await sb.from("recensioni").select("rating").eq("prof_id", profId);
-  const { count: thanksCount } = await sb.from("ringraziamenti").select("*", { count: "exact", head: true }).eq("prof_id", profId);
+  const { data: thanksCount } = await sb.rpc("conta_ringraziamenti", { p_prof: profId });
   const { data: confermateCount } = await sb.rpc("conta_confermate", { p_prof: profId });
   const reviewCount = reviews ? reviews.length : 0;
   const ratingSum = reviews ? reviews.reduce((s,r)=>s+r.rating, 0) : 0;
   return { reviewCount, avgRating: reviewCount ? ratingSum/reviewCount : 0, thanksCount: thanksCount || 0, confermateCount: confermateCount || 0 };
 }
 
-async function submitThanks(profId, btnEl){
-  const { error } = await sb.from("ringraziamenti").insert({ prof_id: profId });
-  if(error){ showToast("Errore, riprova."); return; }
-  showToast("Ringraziamento pubblicato sul profilo.");
-  btnEl.disabled = true;
-  btnEl.textContent = "🙏 Grazie inviato";
+async function loadThanksBox(){
+  const el = document.getElementById("thanks-box");
+  if(!el) return;
+  const { data, error } = await sb.rpc("scambi_ringraziabili");
+  if(error || !data || !data.length){ el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="notice" style="border-left-color:var(--sage);"><strong>Scambi di pazienti da ringraziare</strong>` +
+    data.map(r => `<div class="incoming-row">
+      <span>Scambio confermato dal paziente con <strong>${escapeHtml(r.collega_nome)}</strong></span>
+      <button class="thanks-btn" onclick="submitThanks('${r.segnalazione}')">🙏 Ringrazia</button>
+    </div>`).join("") + `</div>`;
+}
+
+async function submitThanks(segId){
+  const { error } = await sb.rpc("ringrazia", { p_segnalazione: segId });
+  if(error){ showToast(error.message); return; }
+  showToast("Ringraziamento inviato.");
+  loadThanksBox();
   loadResults();
 }
 
-function copyReviewLink(profId){
-  const url = location.origin + location.pathname + "?review=" + profId;
-  navigator.clipboard.writeText(url).then(()=>{
-    showToast("Link copiato. Invialo al paziente.");
-  }).catch(()=>{
-    prompt("Copia questo link e invialo al paziente:", url);
-  });
+/* ---- link recensione monouso (li genera solo il professionista, dal proprio profilo) ---- */
+async function refreshReviewLinksBox(){
+  const box = document.getElementById("review-links-box");
+  if(!box) return;
+  if(!editingProfId || !currentProf || !currentProf.membership_attiva){ box.style.display = "none"; return; }
+  box.style.display = "block";
+  const { count } = await sb.from("inviti_recensione").select("*", { count: "exact", head: true }).eq("prof_id", editingProfId).is("used_at", null);
+  document.getElementById("review-links-pending").textContent = count ? "Link generati e non ancora usati: " + count : "Nessun link in attesa.";
 }
 
-let reviewProfId = null;
+async function generaLinkRecensione(){
+  const { data, error } = await sb.rpc("crea_invito_recensione");
+  if(error){ showToast(error.message); return; }
+  const url = location.origin + location.pathname + "?review=" + data;
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast("Link copiato. Invialo al paziente: funziona una sola volta.");
+  }catch(e){
+    prompt("Copia questo link e invialo al paziente (funziona una sola volta):", url);
+  }
+  refreshReviewLinksBox();
+}
+
+async function annullaLinkRecensione(){
+  const { error } = await sb.rpc("annulla_inviti_recensione");
+  if(error){ showToast(error.message); return; }
+  showToast("Link non usati annullati.");
+  refreshReviewLinksBox();
+}
+
+let reviewToken = null;
 let reviewRating = 0;
 
 async function initReviewPageIfNeeded(){
   const params = new URLSearchParams(location.search);
-  const id = params.get("review");
-  if(!id) return false;
-  reviewProfId = id;
+  const token = params.get("review");
+  if(!token) return false;
+  reviewToken = token;
 
   document.querySelector("header").style.display = "none";
   document.querySelectorAll("main > section.panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("recensione").classList.add("active");
 
-  if(CONFIGURED){
-    const { data } = await sb.rpc("nome_professionista", { p_id: id });
-    document.getElementById("rev-prof-name").textContent = data || "questo professionista";
-  }
+  const wrap = document.getElementById("review-form-wrap");
+  const invalid = () => { wrap.innerHTML = '<h2>Link non valido</h2><p style="color:var(--ink-soft); margin-top:10px;">Questo link è già stato utilizzato oppure non esiste.</p>'; };
+
+  if(!CONFIGURED){ invalid(); return true; }
+  const { data, error } = await sb.rpc("info_invito_recensione", { p_token: token });
+  const row = (!error && Array.isArray(data) && data.length) ? data[0] : null;
+  if(!row){ invalid(); return true; }
+  document.getElementById("rev-prof-name").textContent = row.prof_nome || "questo professionista";
 
   document.querySelectorAll(".hand-pick").forEach(el=>{
     el.onclick = ()=>{
@@ -914,8 +1079,12 @@ async function submitReview(){
   if(reviewRating === 0){ showToast("Seleziona una valutazione da 1 a 5 manine."); return; }
   if(!comment){ showToast("Il commento è obbligatorio."); return; }
 
-  const { error } = await sb.from("recensioni").insert({ prof_id: reviewProfId, rating: reviewRating, comment });
+  const { data, error } = await sb.rpc("invia_recensione", { p_token: reviewToken, p_rating: reviewRating, p_commento: comment });
   if(error){ showToast("Errore nell'invio: " + error.message); return; }
+  if(data === false){
+    document.getElementById("review-form-wrap").innerHTML = '<h2>Link già utilizzato</h2><p style="color:var(--ink-soft); margin-top:10px;">Questa recensione era già stata inviata.</p>';
+    return;
+  }
 
   document.getElementById("review-form-wrap").style.display = "none";
   document.getElementById("review-thanks-wrap").style.display = "block";
@@ -933,29 +1102,29 @@ let profLoadTried = false;
 async function ensureProfLoaded(){
   if(!currentUser || currentProf || profLoadTried) return;
   profLoadTried = true;
-  const { data } = await sb.from("professionisti").select("*").eq("user_id", currentUser.id).maybeSingle();
-  if(data) currentProf = data;
+  const { data } = await sb.rpc("mio_profilo");
+  if(data && data.length) currentProf = data[0];
 }
 
 async function refreshMembership(){
   profLoadTried = false;
   currentProf = null;
   await ensureProfLoaded();
+  if(editingProfId) await loadOwnProfileIntoForm();
   if(currentProf && currentProf.membership_attiva){ showToast("Membership attiva. Buona ricerca!"); }
   else { showToast("La membership non risulta ancora attiva."); }
   loadResults();
 }
 
+function stripeLink(base, email){
+  // client_reference_id permette a Stripe di dire al webhook quale utente ha pagato
+  return base + "?prefilled_email=" + encodeURIComponent(email || (currentUser && currentUser.email) || "")
+    + "&client_reference_id=" + encodeURIComponent(currentUser ? currentUser.id : "");
+}
+
 function gateHtml(){
-  if(!currentProf){
-    return `<div class="notice error"><strong>Ricerca riservata ai soci.</strong> Per cercare i colleghi, anche sulla mappa, serve un profilo con membership attiva. Crea prima il tuo profilo.<br><br>
-      <button class="btn btn-primary btn-small" onclick="switchPanel('iscrizione')">Crea il mio profilo</button></div>`;
-  }
-  const email = encodeURIComponent(currentProf.email || (currentUser && currentUser.email) || "");
-  return `<div class="notice error"><strong>Ricerca riservata ai soci.</strong> La ricerca dei colleghi, anche per posizione sulla mappa, è disponibile solo con la membership attiva.<br><br>
-    <a href="${STRIPE_LINK_MENSILE}?prefilled_email=${email}" target="_blank" class="btn btn-primary btn-small" style="text-decoration:none; display:inline-block; margin-right:8px;">Attiva mensile — 10 €/mese</a>
-    <a href="${STRIPE_LINK_ANNUALE}?prefilled_email=${email}" target="_blank" class="btn btn-ghost btn-small" style="text-decoration:none; display:inline-block;">Attiva annuale — 100 €/anno</a>
-    <p style="font-size:12px; margin-top:12px;">Dopo il pagamento l'attivazione richiede una breve verifica manuale. Se hai già pagato e hai ricevuto conferma, <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="refreshMembership()">ricontrolla lo stato</span>.</p></div>`;
+  return `<div class="notice error"><strong>Crea prima il tuo profilo gratuito.</strong> Per cercare i colleghi serve un profilo: la registrazione è gratuita e i primi 100 iscritti diventano Founders, con ricerca e contatti illimitati per 12 mesi.<br><br>
+    <button class="btn btn-primary btn-small" onclick="switchPanel('iscrizione')">Crea il mio profilo</button></div>`;
 }
 
 /* ================= RICERCA PER POSIZIONE E MAPPA ================= */
@@ -1060,7 +1229,7 @@ function renderMap(list, raggio){
       .addTo(mapLayer)
       .bindPopup("<strong>" + escapeHtml(p.nome) + "</strong><br>" + escapeHtml(p.professione || "") + " · " + escapeHtml(p.area || "")
         + "<br>" + (p.specializzazioni || []).map(escapeHtml).join(", ") + km
-        + '<br><a href="mailto:' + encodeURIComponent(p.email || "") + '">Scrivi via email</a>');
+        + "<br><em>Contatti nella lista sotto la mappa</em>");
     punti.push(pos);
   });
   if(cerchio){ mapObj.fitBounds(cerchio.getBounds(), { padding: [10, 10] }); }
@@ -1070,10 +1239,64 @@ function renderMap(list, raggio){
 
 /* ================= ANNUNCI ================= */
 function isMember(){ return !!(currentUser && currentProf && currentProf.membership_attiva); }
+function founderAttivo(){ return !!(currentUser && currentProf && currentProf.founder && currentProf.founder_fino && new Date(currentProf.founder_fino) > new Date()); }
+function pianoCorrente(){ return isMember() ? "pro" : (founderAttivo() ? "founder" : "free"); }
+function dataIt(v){ try{ return new Date(v).toLocaleDateString("it-IT"); }catch(e){ return ""; } }
+function proBtnHtml(small){
+  return `<a href="${stripeLink(STRIPE_LINK_ANNUALE, currentProf && currentProf.email)}" target="_blank" class="btn btn-primary${small ? " btn-small" : ""}" style="text-decoration:none; display:inline-block;">Diventa Pro — 100 €/anno</a>`;
+}
+
+async function loadFoundersCounter(){
+  if(!CONFIGURED) return;
+  const { data } = await sb.rpc("founders_posti");
+  const n = (typeof data === "number") ? data : null;
+  document.querySelectorAll(".founders-left").forEach(el => { el.textContent = n === null ? "—" : n; });
+  const fill = document.getElementById("founders-bar-fill");
+  if(fill && n !== null) fill.style.width = Math.max(0, Math.min(100, 100 - n)) + "%";
+  const card = document.getElementById("founders-card");
+  const cta = document.getElementById("founders-cta");
+  if(card && n === 0){
+    card.classList.add("esaurito");
+    if(cta) cta.textContent = "Posti esauriti";
+  }
+}
+
+async function renderQuotaBox(){
+  const el = document.getElementById("quota-box");
+  if(!el) return;
+  const piano = pianoCorrente();
+  if(piano === "pro"){
+    el.innerHTML = '<div class="quota-bar">✅ <strong>Piano Pro</strong>: ricerca e contatti illimitati, profilo visibile ai colleghi.</div>';
+    return;
+  }
+  const { data } = await sb.rpc("contatti_usati");
+  const u = Array.isArray(data) ? data[0] : data;
+  if(piano === "founder"){
+    el.innerHTML = `<div class="quota-bar founder">🎖️ <strong>Founder n. ${currentProf.founder_numero}</strong>: contatti illimitati verso i professionisti Pro fino al ${dataIt(currentProf.founder_fino)} (massimo 20 al giorno). Il tuo profilo non è visibile ai colleghi.<br><div style="margin-top:8px;">${proBtnHtml(true)}</div></div>`;
+  } else {
+    const usati = u ? u.mese : 0;
+    const scaduto = currentProf && currentProf.founder ? " Il vantaggio Founders è terminato." : "";
+    el.innerHTML = `<div class="quota-bar free"><strong>Piano Free</strong>: contatti usati questo mese ${usati}/3.${scaduto} Il tuo profilo non è visibile ai colleghi.<br><div style="margin-top:8px;">${proBtnHtml(true)}</div></div>`;
+  }
+}
+
+async function mostraContatti(profId){
+  const { data, error } = await sb.rpc("ottieni_contatto", { p_prof: profId });
+  if(error){ showToast(error.message); renderQuotaBox(); return; }
+  const c = Array.isArray(data) ? data[0] : data;
+  if(!c){ showToast("Contatto non disponibile."); return; }
+  const slot = document.getElementById("slot-" + profId);
+  if(slot){
+    slot.innerHTML = `<span class="ann-status">✉️ <a href="mailto:${encodeURIComponent(c.c_email || "")}">${escapeHtml(c.c_email || "")}</a>`
+      + (c.c_telefono ? ` · 📞 <a href="tel:${encodeURIComponent(c.c_telefono)}">${escapeHtml(c.c_telefono)}</a>` : "") + `</span>`;
+  }
+  renderQuotaBox();
+}
 function fmtDate(str){
   try{ return new Date(str).toLocaleDateString("it-IT", { day:"numeric", month:"short" }); }catch(e){ return ""; }
 }
 populateFilterSelect("ann-tipo", TIPI_PAZIENTE);
+populateFilterSelect("ann-spec", SPECIALIZZAZIONI);
 
 async function loadHomeAnnunci(){
   const el = document.getElementById("home-annunci-list");
@@ -1104,26 +1327,35 @@ async function publishAnnuncio(){
   if(!isMember()){ showToast("Serve una membership attiva per pubblicare annunci."); return; }
   const tipo = document.getElementById("ann-tipo").value;
   const zona = document.getElementById("ann-zona").value.trim();
-  const dettagli = document.getElementById("ann-dettagli").value.trim();
-  if(!tipo || !zona || !dettagli){ showToast("Compila tipo di paziente, zona e dettagli."); return; }
+  const rawIniz = document.getElementById("ann-iniz").value.replace(/[\s.]/g, "");
+  const spec = document.getElementById("ann-spec").value;
+  if(!tipo || !zona || !rawIniz || !spec){ showToast("Compila tipo di paziente, zona, iniziali e specializzazione richiesta."); return; }
+  if(!/^[A-Za-zÀ-ÿ]{1,3}$/.test(rawIniz)){ showToast("Scrivi solo le iniziali del paziente: da 1 a 3 lettere (es. M.R.), senza altri dati."); return; }
+  const iniziali = rawIniz.toUpperCase().split("").join(".") + ".";
 
   const { data: ann, error } = await sb.from("annunci").insert({ user_id: currentUser.id, tipo_paziente: tipo, zona }).select().single();
   if(error){ showToast("Errore nella pubblicazione: " + error.message); return; }
 
-  const { error: e2 } = await sb.from("annunci_dettagli").insert({ annuncio_id: ann.id, user_id: currentUser.id, dettagli });
+  const { error: e2 } = await sb.from("annunci_dettagli").insert({ annuncio_id: ann.id, user_id: currentUser.id, iniziali, specializzazione_richiesta: spec });
   if(e2){
     await sb.from("annunci").delete().eq("id", ann.id);
-    showToast("Errore nel salvataggio dei dettagli: " + e2.message);
+    showToast("Errore nel salvataggio dei dati: " + e2.message);
     return;
   }
 
   document.getElementById("ann-tipo").value = "";
   document.getElementById("ann-zona").value = "";
-  document.getElementById("ann-dettagli").value = "";
+  document.getElementById("ann-iniz").value = "";
+  document.getElementById("ann-spec").value = "";
   document.getElementById("ann-form").style.display = "none";
   showToast("Annuncio pubblicato.");
   loadAnnunci();
   loadHomeAnnunci();
+}
+
+function annDetailHtml(d){
+  if(!d) return "";
+  return `<div class="ann-detail"><strong>Iniziali paziente:</strong> ${escapeHtml(d.iniziali || "—")}<br><strong>Specializzazione richiesta:</strong> ${escapeHtml(d.specializzazione_richiesta || "—")}</div>`;
 }
 
 async function loadAnnunci(){
@@ -1148,13 +1380,10 @@ async function loadAnnunci(){
     const ids = list.map(a => a.id);
     const { data: mie } = await sb.from("annunci_richieste").select("annuncio_id,stato").eq("richiedente_id", currentUser.id).in("annuncio_id", ids);
     (mie || []).forEach(r => { richiesteMap[r.annuncio_id] = r.stato; });
-    const { data: det } = await sb.from("annunci_dettagli").select("annuncio_id,dettagli").in("annuncio_id", ids);
-    (det || []).forEach(d => { detailsMap[d.annuncio_id] = d.dettagli; });
-    const approvedAuthors = list.filter(a => a.user_id !== currentUser.id && richiesteMap[a.id] === "approvata").map(a => a.user_id);
-    if(approvedAuthors.length){
-      const { data: auth } = await sb.from("professionisti").select("user_id,nome,email,telefono").in("user_id", approvedAuthors);
-      (auth || []).forEach(p => { authorsMap[p.user_id] = p; });
-    }
+    const { data: det } = await sb.from("annunci_dettagli").select("annuncio_id,iniziali,specializzazione_richiesta").in("annuncio_id", ids);
+    (det || []).forEach(d => { detailsMap[d.annuncio_id] = d; });
+    const { data: ctc } = await sb.rpc("contatti_annunci_approvati");
+    (ctc || []).forEach(c => { authorsMap[c.annuncio] = c; });
     const myIds = list.filter(a => a.user_id === currentUser.id).map(a => a.id);
     if(myIds.length){
       const { data: inc } = await sb.from("annunci_richieste").select("*").in("annuncio_id", myIds).eq("stato","in attesa");
@@ -1183,16 +1412,16 @@ async function loadAnnunci(){
     let action = "";
     if(mine){
       action = `<div class="ann-status">Il tuo annuncio</div>
-        ${detailsMap[a.id] ? `<div class="ann-detail">${escapeHtml(detailsMap[a.id])}</div>` : ""}
+        ${annDetailHtml(detailsMap[a.id])}
         <button class="btn btn-ghost btn-small" onclick="chiudiAnnuncio('${a.id}')">Chiudi annuncio</button>`;
     } else if(!currentUser){
       action = `<button class="btn btn-ghost btn-small" onclick="switchPanel('accedi')">Accedi per richiedere i dettagli</button>`;
-    } else if(!isMember()){
-      action = `<div class="ann-status">Serve una membership attiva per richiedere i dettagli.</div>`;
+    } else if(!(isMember() || founderAttivo())){
+      action = `<div class="ann-status">Serve la membership Pro (o il vantaggio Founders) per richiedere i dettagli.</div>`;
     } else if(stato === "approvata"){
-      const au = authorsMap[a.user_id];
-      action = `${detailsMap[a.id] ? `<div class="ann-detail">${escapeHtml(detailsMap[a.id])}</div>` : ""}
-        ${au ? `<div class="ann-status">Contatto: <strong>${escapeHtml(au.nome)}</strong> · <a href="mailto:${encodeURIComponent(au.email)}">${escapeHtml(au.email)}</a>${au.telefono ? " · " + escapeHtml(au.telefono) : ""}</div>` : ""}`;
+      const au = authorsMap[a.id];
+      action = `${annDetailHtml(detailsMap[a.id])}
+        ${au ? `<div class="ann-status">Contatto: <strong>${escapeHtml(au.c_nome)}</strong> · <a href="mailto:${encodeURIComponent(au.c_email)}">${escapeHtml(au.c_email)}</a>${au.c_telefono ? " · " + escapeHtml(au.c_telefono) : ""}</div>` : ""}`;
     } else if(stato === "in attesa"){
       action = `<div class="ann-status">⏳ Richiesta inviata, in attesa di risposta.</div>`;
     } else if(stato === "rifiutata"){
@@ -1210,7 +1439,7 @@ async function loadAnnunci(){
 }
 
 async function richiediDettagli(annId){
-  if(!isMember()){ showToast("Serve una membership attiva."); return; }
+  if(!(isMember() || founderAttivo())){ showToast("Serve la membership Pro o il vantaggio Founders."); return; }
   const { error } = await sb.from("annunci_richieste").insert({
     annuncio_id: annId,
     richiedente_id: currentUser.id,
@@ -1319,6 +1548,7 @@ async function submitConfirm(){
   const isReview = (await initReviewPageIfNeeded()) || (await initConfirmPageIfNeeded());
   if(!isReview){
     loadHomeAnnunci();
+    loadFoundersCounter();
     loadResults();
     if(CONFIGURED){
       const { data: sessionData } = await sb.auth.getSession();

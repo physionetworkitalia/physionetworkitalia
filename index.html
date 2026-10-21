@@ -256,6 +256,9 @@
   .check{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); margin:2px 0 14px; cursor:pointer; }
   .check input{ width:auto; margin:0; }
 
+  .plans .plans-invite{ text-align:center; font-size:14px; color:var(--ink-soft); margin:12px auto 0; max-width:none; line-height:1.5; }
+  #invito-banner{ margin-bottom:16px; border-left-color:var(--ocher); background:#FFF3EE; }
+
   .toast{
     position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
     background:var(--petrol-900); color:var(--paper); padding:12px 20px; border-radius:8px;
@@ -279,6 +282,10 @@
 </header>
 
 <main>
+  <div class="notice" id="invito-banner" style="display:none;">
+    🎁 Un collega ti ha invitato su <strong>Physio Network Italia</strong>. L'iscrizione è gratuita.
+    <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="switchPanel('iscrizione')">Iscriviti ora</span>
+  </div>
 
   <section class="panel active" id="home">
     <div class="hero">
@@ -363,6 +370,7 @@
           </div>
         </div>
         <p class="plans-foot">Nella rete i colleghi cercano i professionisti Pro. Se non sei Pro, per loro non esisti: attiva la membership e fatti trovare.</p>
+        <p class="plans-invite">🎁 Hai perso i primi 100? <strong>Invita 5 colleghi</strong> con l'albo verificato e ottieni anche tu il piano Founders per 12 mesi.</p>
       </div>
 
     </div>
@@ -556,6 +564,15 @@
       <button class="btn btn-ghost btn-small" onclick="annullaLinkRecensione()" style="margin-left:8px;">Annulla i link non usati</button>
       <p class="mono" id="review-links-pending" style="font-size:12px; color:var(--ink-soft); margin-top:12px;"></p>
     </div>
+
+    <div class="card" id="invite-box" style="display:none; margin-top:16px;">
+      <h3 style="font-size:18px; color:var(--petrol-900);">Invita i colleghi</h3>
+      <p style="font-size:13px; color:var(--ink-soft); margin:6px 0 12px; line-height:1.5;">Manda il tuo link a un collega: può iscriversi gratis, anche senza attivare la membership. Quando <strong>5 colleghi invitati</strong> avranno l'iscrizione all'albo verificata, ottieni anche tu il piano <strong>Founders</strong> per 12 mesi. Il premio è per chi non è già Founders.</p>
+      <div class="founders-bar"><span id="invite-bar-fill"></span></div>
+      <p class="mono" id="invite-progress" style="font-size:12px; color:var(--ink-soft); margin:8px 0 12px;"></p>
+      <button class="btn btn-primary btn-small" onclick="condividiInvito()">Condividi il mio link</button>
+      <button class="btn btn-ghost btn-small" onclick="copiaInvito()" style="margin-left:8px;">Copia il link</button>
+    </div>
   </section>
 
   <section class="panel" id="accedi">
@@ -644,6 +661,17 @@ const ALBO_LABEL = {
   "Altro": "Altro albo o ordine"
 };
 const ALBO_PER_PROFESSIONE = { "Fisioterapista": "FNOFI", "Medico": "OMCeO", "Infermiere": "OPI" };
+
+// inviti tra colleghi
+const INVITO_KEY = "pni_invito";
+function codiceInvitoSalvato(){ const c = lsGet(INVITO_KEY); return (c && /^[a-f0-9]{8}$/.test(c)) ? c : null; }
+async function registraInvito(codice){
+  if(!codice) return false;
+  const { data } = await sb.rpc("registra_invito", { p_codice: codice });
+  lsDel(INVITO_KEY);
+  return data === true;
+}
+function founderEtichetta(d){ return d.founder_numero ? "Founder n. " + d.founder_numero : "Founder per gli inviti"; }
 const CONFIGURED = !SUPABASE_URL.startsWith("INCOLLA") && !SUPABASE_ANON_KEY.startsWith("INCOLLA");
 
 /* Link di pagamento Stripe — incolla qui i tuoi due Payment Link */
@@ -803,7 +831,7 @@ async function submitProf(){
     // i dati del profilo viaggiano con la registrazione: dopo la conferma dell'email il profilo si crea da solo
     const { data: authData, error: authError } = await sb.auth.signUp({
       email, password,
-      options: { emailRedirectTo: location.origin + location.pathname, data: { profilo: payload } }
+      options: { emailRedirectTo: location.origin + location.pathname, data: { profilo: payload, invito: codiceInvitoSalvato() } }
     });
     if(authError){
       showToast(/rate limit/i.test(authError.message) ? "Troppe richieste di email: riprova tra qualche minuto." : "Errore nella creazione dell'account: " + authError.message);
@@ -820,7 +848,7 @@ async function submitProf(){
     }
     currentUser = authData.user;
     userId = authData.user.id;
-    sb.auth.updateUser({ data: { profilo: null } });   // la bozza non serve più
+    sb.auth.updateUser({ data: { profilo: null, invito: null } });   // la bozza non serve più
   }
 
   payload.user_id = userId;
@@ -830,6 +858,7 @@ async function submitProf(){
     showToast(error.code === "23505" ? DUP_MSG : "Errore nel salvataggio profilo: " + error.message);
     return;
   }
+  await registraInvito(codiceInvitoSalvato());
 
   document.getElementById("in-password").value = "";
   await loadOwnProfileIntoForm();
@@ -838,9 +867,58 @@ async function submitProf(){
   switchPanel("iscrizione");
 }
 
+function linkInvito(){
+  return location.origin + location.pathname + "?invito=" + ((currentProf && currentProf.codice_invito) || "");
+}
+
+async function loadInvitiBox(){
+  const box = document.getElementById("invite-box");
+  if(!box) return;
+  if(!currentProf || !currentProf.codice_invito){ box.style.display = "none"; return; }
+  box.style.display = "block";
+  const { data } = await sb.rpc("miei_inviti");
+  const r = Array.isArray(data) ? data[0] : data;
+  const iscritti = r ? r.iscritti : 0;
+  const verificati = r ? r.verificati : 0;
+  document.getElementById("invite-bar-fill").style.width = Math.min(100, (verificati / 5) * 100) + "%";
+  // se nel frattempo è scattato il premio, aggiorno il profilo
+  if(verificati >= 5 && !currentProf.invito_premio){
+    const { data: righe } = await sb.rpc("mio_profilo");
+    if(righe && righe[0] && righe[0].invito_premio){
+      currentProf = righe[0];
+      showToast("🎉 Hai ottenuto il piano Founders con gli inviti!");
+      renderQuotaBox();
+    }
+  }
+  document.getElementById("invite-progress").textContent = currentProf.invito_premio
+    ? "🎉 Hai ottenuto il piano Founders con gli inviti. Colleghi invitati: " + iscritti + "."
+    : "Colleghi invitati: " + iscritti + " · con albo verificato: " + verificati + " su 5"
+      + (founderAttivo() ? " · sei già Founder: il premio non si somma" : "");
+}
+
+async function copiaInvito(){
+  const url = linkInvito();
+  try{ await navigator.clipboard.writeText(url); showToast("Link copiato. Mandalo ai colleghi."); }
+  catch(e){ prompt("Copia questo link e mandalo ai colleghi:", url); }
+}
+
+async function condividiInvito(){
+  const url = linkInvito();
+  const testo = "Ti invito su Physio Network Italia, la rete dei professionisti sanitari. Iscriviti gratis con il mio link:";
+  if(navigator.share){
+    try{ await navigator.share({ title: "Physio Network Italia", text: testo, url }); return; }catch(e){ /* annullato */ }
+  }
+  window.open("https://wa.me/?text=" + encodeURIComponent(testo + " " + url), "_blank");
+}
+
+function mostraBannerInvito(){
+  const el = document.getElementById("invito-banner");
+  if(el) el.style.display = (codiceInvitoSalvato() && !currentUser) ? "block" : "none";
+}
+
 function messaggioBenvenuto(){
   return (currentProf && currentProf.founder)
-    ? "Benvenuto tra i Founders, numero " + currentProf.founder_numero + "! Hai ricerca e contatti illimitati per 12 mesi."
+    ? (currentProf.founder_numero ? "Benvenuto tra i Founders, numero " + currentProf.founder_numero : "Benvenuto tra i Founders") + "! Hai ricerca e contatti illimitati per 12 mesi."
     : "Profilo creato nel piano Free. Attiva la membership Pro per essere visibile ai colleghi.";
 }
 
@@ -865,12 +943,14 @@ async function creaProfiloDaMetadata(){
   const bozza = currentUser.user_metadata && currentUser.user_metadata.profilo;
   if(!bozza) return false;
   await ensureProfLoaded();
-  if(currentProf){ sb.auth.updateUser({ data: { profilo: null } }); return false; }
+  if(currentProf){ sb.auth.updateUser({ data: { profilo: null, invito: null } }); return false; }
   const campi = ["nome","professione","specializzazione_medica","corsi_fisio","altre_specializzazioni","numero_albo","albo_ordine","albo_provincia","specializzazioni","area","modalita","tipi_paziente","email","telefono","bio","lat","lng"];
   const riga = { user_id: currentUser.id };
   campi.forEach(k => { if(bozza[k] !== undefined) riga[k] = bozza[k]; });
+  const codInvito = (currentUser.user_metadata && currentUser.user_metadata.invito) || codiceInvitoSalvato();
   const { error } = await sb.from("professionisti").insert(riga);
-  await sb.auth.updateUser({ data: { profilo: null } });
+  if(!error && codInvito) await registraInvito(String(codInvito).toLowerCase());
+  await sb.auth.updateUser({ data: { profilo: null, invito: null } });
   if(error){
     showToast(error.code === "23505" ? DUP_MSG : "Il profilo non è stato creato: " + error.message);
     return false;
@@ -916,6 +996,7 @@ async function login(){
     return;
   }
   currentUser = data.user;
+  mostraBannerInvito();
   const creato = await creaProfiloDaMetadata();
   await loadOwnProfileIntoForm();
   if(creato) loadFoundersCounter();
@@ -938,6 +1019,7 @@ async function logout(){
   document.getElementById("membership-banner").style.display = "none";
   const rbx = document.getElementById("review-links-box"); if(rbx) rbx.style.display = "none";
   const asx = document.getElementById("albo-status"); if(asx) asx.style.display = "none";
+  const ibx = document.getElementById("invite-box"); if(ibx) ibx.style.display = "none";
   showToast("Sei uscito dal tuo account.");
   switchPanel("home");
 }
@@ -954,7 +1036,7 @@ function renderPlanBanner(banner, d){
   banner.classList.add("error");
   let testo;
   if(founderOn){
-    testo = `🎖️ <strong>Sei Founder n. ${d.founder_numero}</strong>: ricerca e contatti illimitati verso i professionisti Pro fino al ${dataIt(d.founder_fino)}. Finché non attivi la membership Pro il tuo profilo <strong>non è visibile</strong> nella ricerca e non puoi ricevere richieste di collaborazione.`;
+    testo = `🎖️ <strong>Sei ${founderEtichetta(d)}</strong>: ricerca e contatti illimitati verso i professionisti Pro fino al ${dataIt(d.founder_fino)}. Finché non attivi la membership Pro il tuo profilo <strong>non è visibile</strong> nella ricerca e non puoi ricevere richieste di collaborazione.`;
   } else if(d.founder){
     testo = `Il vantaggio Founders è terminato il ${dataIt(d.founder_fino)}. Ora sei nel piano Free: puoi cercare e contattare fino a 3 professionisti al mese e il tuo profilo <strong>non è visibile</strong> ai colleghi.`;
   } else {
@@ -980,11 +1062,13 @@ async function loadOwnProfileIntoForm(){
     document.getElementById("membership-banner").style.display = "none";
     const rb = document.getElementById("review-links-box"); if(rb) rb.style.display = "none";
     const as0 = document.getElementById("albo-status"); if(as0) as0.style.display = "none";
+    const ib0 = document.getElementById("invite-box"); if(ib0) ib0.style.display = "none";
     return;
   }
 
   editingProfId = data.id;
   refreshReviewLinksBox();
+  loadInvitiBox();
   const banner = document.getElementById("membership-banner");
   banner.style.display = "block";
   renderPlanBanner(banner, data);
@@ -1424,7 +1508,7 @@ async function renderQuotaBox(){
   const { data } = await sb.rpc("contatti_usati");
   const u = Array.isArray(data) ? data[0] : data;
   if(piano === "founder"){
-    el.innerHTML = `<div class="quota-bar founder">🎖️ <strong>Founder n. ${currentProf.founder_numero}</strong>: contatti illimitati verso i professionisti Pro fino al ${dataIt(currentProf.founder_fino)} (massimo 20 al giorno). Il tuo profilo non è visibile ai colleghi.<br><div style="margin-top:8px;">${proBtnHtml(true)}</div></div>`;
+    el.innerHTML = `<div class="quota-bar founder">🎖️ <strong>${founderEtichetta(currentProf)}</strong>: contatti illimitati verso i professionisti Pro fino al ${dataIt(currentProf.founder_fino)} (massimo 20 al giorno). Il tuo profilo non è visibile ai colleghi.<br><div style="margin-top:8px;">${proBtnHtml(true)}</div></div>`;
   } else {
     const usati = u ? u.mese : 0;
     const scaduto = currentProf && currentProf.founder ? " Il vantaggio Founders è terminato." : "";
@@ -1728,8 +1812,11 @@ async function submitConfirm(){
 }
 
 (async ()=>{
+  const invParam = new URLSearchParams(location.search).get("invito");
+  if(invParam && /^[A-Za-z0-9]{8}$/.test(invParam)) lsSet(INVITO_KEY, invParam.toLowerCase());
   const isReview = (await initReviewPageIfNeeded()) || (await initConfirmPageIfNeeded());
   if(!isReview){
+    mostraBannerInvito();
     loadHomeAnnunci();
     loadFoundersCounter();
     loadResults();
@@ -1737,6 +1824,7 @@ async function submitConfirm(){
       const { data: sessionData } = await sb.auth.getSession();
       if(sessionData && sessionData.session){
         currentUser = sessionData.session.user;
+        mostraBannerInvito();
         const creato = await creaProfiloDaMetadata();
         await loadOwnProfileIntoForm();
         if(creato){

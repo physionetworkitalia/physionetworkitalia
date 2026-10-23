@@ -259,6 +259,15 @@
   .plans .plans-invite{ text-align:center; font-size:14px; color:var(--ink-soft); margin:12px auto 0; max-width:none; line-height:1.5; }
   #invito-banner{ margin-bottom:16px; border-left-color:var(--ocher); background:#FFF3EE; }
 
+  nav button{ white-space:nowrap; }
+  .nav-badge{ display:inline-block; min-width:18px; padding:1px 5px; margin-left:5px; border-radius:999px; background:var(--ocher); color:var(--petrol-900); font-size:11px; font-weight:700; line-height:1.4; }
+  .notif{ display:flex; gap:12px; padding:14px; background:#fff; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; cursor:pointer; }
+  .notif.nuova{ border-left:4px solid var(--ocher); background:#FFF8F5; }
+  .notif .t{ font-weight:600; color:var(--petrol-900); font-size:14px; }
+  .notif .m{ font-size:13px; color:var(--ink-soft); margin-top:3px; line-height:1.45; }
+  .notif .d{ font-size:11px; color:var(--ink-soft); margin-top:6px; }
+  .notif .go{ color:var(--petrol-700); text-decoration:underline; }
+
   .toast{
     position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
     background:var(--petrol-900); color:var(--paper); padding:12px 20px; border-radius:8px;
@@ -276,8 +285,9 @@
   <nav>
     <button data-panel="cerca">Trova</button>
     <button data-panel="annunci">Annunci</button>
-    <button data-panel="iscrizione">Iscriviti</button>
-    <button data-panel="accedi">Accedi</button>
+    <button data-panel="notifiche" id="nav-notifiche" style="display:none;">Notifiche<span class="nav-badge" id="notif-badge" style="display:none;"></span></button>
+    <button data-panel="iscrizione" id="nav-profilo">Iscriviti</button>
+    <button data-panel="accedi" id="nav-accedi">Accedi</button>
   </nav>
 </header>
 
@@ -297,7 +307,7 @@
           <p>Quando un paziente ha bisogno di competenze che non hai, non perderlo: trovi il collega giusto per specializzazione, area geografica e tipo di caso, e resti comunque il punto di riferimento della sua cura.</p>
           <div class="hero-cta">
             <button class="btn btn-primary" onclick="switchPanel('cerca')">Trova un professionista</button>
-            <button class="btn btn-ghost" onclick="switchPanel('iscrizione')">Iscriviti alla rete</button>
+            <button class="btn btn-ghost" id="hero-iscriviti" onclick="switchPanel('iscrizione')">Iscriviti alla rete</button>
             <span class="hero-link" onclick="document.getElementById('piani').scrollIntoView({behavior:'smooth'})">Scopri i piani →</span>
           </div>
         </div>
@@ -370,7 +380,7 @@
           </div>
         </div>
         <p class="plans-foot">Nella rete i colleghi cercano i professionisti Pro. Se non sei Pro, per loro non esisti: attiva la membership e fatti trovare.</p>
-        <p class="plans-invite">🎁 Hai perso i primi 100? <strong>Invita 5 colleghi</strong> con l'albo verificato e ottieni anche tu il piano Founders per 12 mesi.</p>
+        <p class="plans-invite">🎁 Hai perso i primi 100? <strong>Invita 5 colleghi</strong> con l'albo verificato e ottieni anche tu i vantaggi Founders per 12 mesi: ricerca e contatti illimitati. Non è una membership Pro gratuita.</p>
       </div>
 
     </div>
@@ -459,8 +469,17 @@
     <div class="ann-grid" id="ann-list"></div>
   </section>
 
+  <section class="panel" id="notifiche">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;">
+      <h2 style="color:var(--petrol-900); font-size:26px;">Notifiche</h2>
+      <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="segnaTutteLette()">Segna tutte come lette</span>
+    </div>
+    <p style="color:var(--ink-soft); font-size:14px; margin:6px 0 16px;">Colleghi che ti contattano, richieste sui tuoi annunci e risposte alle tue richieste.</p>
+    <div id="notif-list"></div>
+  </section>
+
   <section class="panel" id="iscrizione">
-    <h2 style="color:var(--petrol-900); font-size:26px; margin-bottom:16px;">Iscriviti alla rete</h2>
+    <h2 id="iscrizione-title" style="color:var(--petrol-900); font-size:26px; margin-bottom:16px;">Iscriviti alla rete</h2>
 
     <div class="notice" id="signup-pending" style="display:none; border-left-color:var(--ocher);"></div>
 
@@ -468,7 +487,7 @@
       Nome, specializzazioni, area e presentazione sono visibili ai professionisti della rete quando il tuo profilo è Pro. Email e telefono non compaiono mai in chiaro: li vede solo chi usa "Mostra contatti", nei limiti del proprio piano.
     </div>
 
-    <div class="notice" style="border-left-color:var(--petrol-700); background:rgba(23,92,92,0.08);">
+    <div class="notice" id="notice-registrazione" style="border-left-color:var(--petrol-700); background:rgba(23,92,92,0.08);">
       <strong style="color:var(--petrol-900);">Registrazione gratuita.</strong> I primi 100 iscritti sono <strong>Founders</strong>: ricerca e contatti illimitati per 12 mesi (posti rimasti: <strong class="founders-left">—</strong>). Per essere visibile ai colleghi e ricevere richieste serve la <strong>membership Pro, 100 € all'anno</strong>, che attivi dal tuo profilo dopo l'iscrizione.
     </div>
 
@@ -567,7 +586,7 @@
 
     <div class="card" id="invite-box" style="display:none; margin-top:16px;">
       <h3 style="font-size:18px; color:var(--petrol-900);">Invita i colleghi</h3>
-      <p style="font-size:13px; color:var(--ink-soft); margin:6px 0 12px; line-height:1.5;">Manda il tuo link a un collega: può iscriversi gratis, anche senza attivare la membership. Quando <strong>5 colleghi invitati</strong> avranno l'iscrizione all'albo verificata, ottieni anche tu il piano <strong>Founders</strong> per 12 mesi. Il premio è per chi non è già Founders.</p>
+      <p style="font-size:13px; color:var(--ink-soft); margin:6px 0 12px; line-height:1.5;">Manda il tuo link a un collega: può iscriversi gratis, anche senza attivare la membership. Quando <strong>5 colleghi invitati</strong> avranno l'iscrizione all'albo verificata, ottieni anche tu il piano <strong>Founders</strong> per 12 mesi: ricerca e contatti illimitati verso i professionisti Pro. Non è una membership Pro gratuita, e il premio è per chi non è già Founders.</p>
       <div class="founders-bar"><span id="invite-bar-fill"></span></div>
       <p class="mono" id="invite-progress" style="font-size:12px; color:var(--ink-soft); margin:8px 0 12px;"></p>
       <button class="btn btn-primary btn-small" onclick="condividiInvito()">Condividi il mio link</button>
@@ -729,11 +748,17 @@ function switchPanel(name){
     showToast("Devi accedere al tuo profilo prima di poter cercare i colleghi.");
     name = "accedi";
   }
+  if(name === "notifiche" && !currentUser){
+    showToast("Accedi per vedere le tue notifiche.");
+    name = "accedi";
+  }
+  if(name === "accedi" && currentUser) name = "iscrizione";   // già online: si va al profilo
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
   document.getElementById(name).classList.add("active");
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
   if(name==="cerca") loadResults();
-  if(name==="annunci") loadAnnunci();
+  if(name==="notifiche") loadNotifiche();
+  if(name==="annunci") return loadAnnunci();
 }
 
 function showToast(msg){
@@ -847,6 +872,7 @@ async function submitProf(){
       return;
     }
     currentUser = authData.user;
+    aggiornaAccesso();
     userId = authData.user.id;
     sb.auth.updateUser({ data: { profilo: null, invito: null } });   // la bozza non serve più
   }
@@ -914,6 +940,97 @@ async function condividiInvito(){
 function mostraBannerInvito(){
   const el = document.getElementById("invito-banner");
   if(el) el.style.display = (codiceInvitoSalvato() && !currentUser) ? "block" : "none";
+}
+
+/* ================= ACCESSO E NOTIFICHE ================= */
+let notifTimer = null;
+let notifUltimoConteggio = null;
+
+function aggiornaAccesso(){
+  const on = !!currentUser;
+  document.getElementById("nav-profilo").textContent = on ? "Profilo" : "Iscriviti";
+  document.getElementById("nav-accedi").style.display = on ? "none" : "";
+  document.getElementById("nav-notifiche").style.display = on ? "" : "none";
+  const h = document.getElementById("iscrizione-title"); if(h) h.textContent = on ? "Il tuo profilo" : "Iscriviti alla rete";
+  const hb = document.getElementById("hero-iscriviti"); if(hb) hb.textContent = on ? "Il tuo profilo" : "Iscriviti alla rete";
+  const nr = document.getElementById("notice-registrazione"); if(nr) nr.style.display = on ? "none" : "";
+  if(on){
+    aggiornaBadgeNotifiche(true);
+    if(!notifTimer) notifTimer = setInterval(() => aggiornaBadgeNotifiche(false), 60000);
+  } else {
+    if(notifTimer){ clearInterval(notifTimer); notifTimer = null; }
+    notifUltimoConteggio = null;
+    const b = document.getElementById("notif-badge"); if(b) b.style.display = "none";
+  }
+}
+
+async function aggiornaBadgeNotifiche(primaVolta){
+  if(!currentUser || !CONFIGURED) return;
+  const { count, error } = await sb.from("notifiche").select("*", { count: "exact", head: true }).eq("letta", false);
+  if(error) return;
+  const n = count || 0;
+  const b = document.getElementById("notif-badge");
+  b.textContent = n > 9 ? "9+" : String(n);
+  b.style.display = n > 0 ? "inline-block" : "none";
+  if(primaVolta){
+    if(n > 0) showToast("🔔 Hai " + n + (n === 1 ? " notifica non letta" : " notifiche non lette"));
+  } else if(notifUltimoConteggio !== null && n > notifUltimoConteggio){
+    showToast("🔔 Hai una nuova notifica");
+    if(document.getElementById("notifiche").classList.contains("active")) loadNotifiche();
+  }
+  notifUltimoConteggio = n;
+}
+
+const NOTIF_ICONE = { annuncio_richiesta: "📋", annuncio_risposta: "✅", segnalazione: "🧑‍⚕️", segnalazione_confermata: "👍", contatto: "✉️", ringraziamento: "🙏" };
+
+function destinazioneNotifica(tipo){
+  if(tipo === "annuncio_richiesta" || tipo === "annuncio_risposta") return { panel: "annunci", label: "Vai agli annunci →" };
+  if(tipo === "segnalazione_confermata") return { panel: "cerca", label: "Apri la ricerca →" };
+  return null;
+}
+
+function dataOraIt(v){
+  try{ return new Date(v).toLocaleString("it-IT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
+  catch(e){ return ""; }
+}
+
+async function loadNotifiche(){
+  const el = document.getElementById("notif-list");
+  if(!requireConfig()){ el.innerHTML = '<div class="empty">Configura prima la connessione a Supabase.</div>'; return; }
+  el.innerHTML = '<div class="empty">Caricamento...</div>';
+  const { data, error } = await sb.from("notifiche").select("id,tipo,titolo,messaggio,letta,created_at").order("created_at", { ascending: false }).limit(50);
+  if(error){ el.innerHTML = '<div class="empty">Errore: ' + escapeHtml(error.message) + '</div>'; return; }
+  if(!data || !data.length){ el.innerHTML = '<div class="empty">Nessuna notifica per ora.</div>'; return; }
+  el.innerHTML = data.map(n => {
+    const d = destinazioneNotifica(n.tipo);
+    return `<div class="notif${n.letta ? "" : " nuova"}" onclick="apriNotifica('${n.id}', '${n.tipo}')">
+      <div style="font-size:22px;">${NOTIF_ICONE[n.tipo] || "🔔"}</div>
+      <div style="flex:1;">
+        <div class="t">${escapeHtml(n.titolo)}</div>
+        ${n.messaggio ? `<div class="m">${escapeHtml(n.messaggio)}</div>` : ""}
+        <div class="d mono">${dataOraIt(n.created_at)}${d ? ` · <span class="go">${d.label}</span>` : ""}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function apriNotifica(id, tipo){
+  await sb.from("notifiche").update({ letta: true }).eq("id", id);
+  aggiornaBadgeNotifiche(false);
+  const d = destinazioneNotifica(tipo);
+  if(!d){ loadNotifiche(); return; }
+  await switchPanel(d.panel);
+  if(tipo === "annuncio_richiesta"){
+    const box = document.getElementById("ann-incoming");
+    if(box && box.innerHTML.trim()) box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+async function segnaTutteLette(){
+  const { error } = await sb.from("notifiche").update({ letta: true }).eq("letta", false);
+  if(error){ showToast("Errore: " + error.message); return; }
+  aggiornaBadgeNotifiche(false);
+  loadNotifiche();
 }
 
 function messaggioBenvenuto(){
@@ -996,6 +1113,7 @@ async function login(){
     return;
   }
   currentUser = data.user;
+  aggiornaAccesso();
   mostraBannerInvito();
   const creato = await creaProfiloDaMetadata();
   await loadOwnProfileIntoForm();
@@ -1007,6 +1125,7 @@ async function login(){
 async function logout(){
   await sb.auth.signOut();
   currentUser = null;
+  aggiornaAccesso();
   currentProf = null;
   profLoadTried = false;
   editingProfId = null;
@@ -1824,6 +1943,7 @@ async function submitConfirm(){
       const { data: sessionData } = await sb.auth.getSession();
       if(sessionData && sessionData.session){
         currentUser = sessionData.session.user;
+        aggiornaAccesso();
         mostraBannerInvito();
         const creato = await creaProfiloDaMetadata();
         await loadOwnProfileIntoForm();

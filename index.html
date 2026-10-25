@@ -236,12 +236,7 @@
   .plans .plan-note{ font-size:12px; color:var(--ink-soft); margin:0; line-height:1.4; max-width:none; }
   .plan .btn{ width:100%; }
   .plan-founder{ border:2px solid var(--ocher); box-shadow:0 8px 28px rgba(255,106,77,0.16); }
-  .plan-pro{ background:var(--petrol-900); color:#fff; border-color:var(--petrol-900); box-shadow:0 10px 30px rgba(36,30,78,0.3); }
-  .plan-pro h4, .plan-pro .plan-price{ color:#fff; }
-  .plan-pro .plan-price small, .plan-pro .plan-note{ color:rgba(255,255,255,0.78); }
-  .plan-pro .plan-list li.yes::before{ color:#7CF0D8; }
   .plan-ribbon{ position:absolute; top:-11px; left:18px; background:var(--ocher); color:var(--petrol-900); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:4px 10px; border-radius:999px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
-  .plan-ribbon.pro{ background:#7CF0D8; }
   .founders-meter{ display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--ink-soft); }
   .founders-bar{ height:8px; border-radius:999px; background:var(--paper-dim); overflow:hidden; }
   .founders-bar span{ display:block; height:100%; width:0; background:linear-gradient(90deg,var(--ocher),#FFB84D); transition:width .6s; }
@@ -267,6 +262,9 @@
   .notif .m{ font-size:13px; color:var(--ink-soft); margin-top:3px; line-height:1.45; }
   .notif .d{ font-size:11px; color:var(--ink-soft); margin-top:6px; }
   .notif .go{ color:var(--petrol-700); text-decoration:underline; }
+
+  .plan-grid.plan-grid-2{ grid-template-columns:repeat(2,1fr); max-width:780px; margin:0 auto; }
+  @media(max-width:820px){ .plan-grid.plan-grid-2{ grid-template-columns:1fr; } }
 
   .toast{
     position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
@@ -331,10 +329,10 @@
       <div class="plans" id="piani">
         <div class="plans-head">
           <span class="eyebrow">Come entrare nella rete</span>
-          <h3 class="plans-title">Scegli il tuo posto nella rete.</h3>
-          <p>I primi 100 professionisti entrano gratis come <strong>Founders</strong>. Per essere trovato dai colleghi e ricevere pazienti serve la membership Pro.</p>
+          <h3 class="plans-title">Gratis per tutti. Founders per chi arriva per primo.</h3>
+          <p>La registrazione è gratuita. I primi 100 professionisti diventano <strong>Founders</strong> e hanno tutte le funzioni. Dopo i primi 100, si diventa Founders invitando 5 colleghi.</p>
         </div>
-        <div class="plan-grid">
+        <div class="plan-grid plan-grid-2">
           <div class="plan plan-founder" id="founders-card">
             <div class="plan-ribbon">Lancio · primi 100</div>
             <h4>Founders 100</h4>
@@ -344,43 +342,30 @@
               <span class="mono">Posti rimasti: <strong class="founders-left">—</strong> su 100</span>
             </div>
             <ul class="plan-list">
-              <li class="yes">Ricerca illimitata dei colleghi con membership attiva</li>
-              <li class="yes">Contatti illimitati verso i professionisti Pro, per 12 mesi dalla registrazione</li>
-              <li class="no">Nessuna visibilità nei risultati di ricerca finché non attivi la membership</li>
-              <li class="no">Nessuna richiesta di collaborazione ricevuta finché resti Free</li>
-            </ul>
-            <p class="plan-note">Un vantaggio di lancio sull'uso gratuito della piattaforma: non è una membership Pro gratuita.</p>
-            <button class="btn btn-primary" id="founders-cta" onclick="switchPanel('iscrizione')">Prenota il tuo posto gratis</button>
-          </div>
-
-          <div class="plan plan-pro">
-            <div class="plan-ribbon pro">Consigliato</div>
-            <h4>Membership Pro</h4>
-            <div class="plan-price">100 € <small>all'anno · oppure 10 € al mese</small></div>
-            <ul class="plan-list">
               <li class="yes">Profilo visibile e ricercabile da tutti i professionisti della rete</li>
               <li class="yes">Ricevi richieste di collaborazione e segnalazioni di pazienti</li>
               <li class="yes">Ricerca e contatti illimitati</li>
               <li class="yes">Bacheca annunci, mappa entro 30 km, recensioni dei pazienti e ringraziamenti</li>
             </ul>
-            <p class="plan-note">Per essere trovato e ricevere pazienti dai colleghi.</p>
-            <button class="btn btn-primary" onclick="switchPanel('iscrizione')">Diventa Pro</button>
+            <p class="plan-note">Per 12 mesi dalla registrazione, con un limite giornaliero contro lo spam.</p>
+            <button class="btn btn-primary" id="founders-cta" onclick="switchPanel('iscrizione')">Prenota il tuo posto gratis</button>
           </div>
 
           <div class="plan plan-free">
             <h4>Free</h4>
-            <div class="plan-price">0 € <small>dopo i primi 100</small></div>
+            <div class="plan-price">Gratis <small>per tutti</small></div>
             <ul class="plan-list">
               <li class="yes">Cerchi e contatti fino a 3 professionisti al mese</li>
+              <li class="yes">Diventi Founder invitando 5 colleghi</li>
               <li class="no">Non compari nella ricerca</li>
               <li class="no">I colleghi non possono contattarti</li>
             </ul>
-            <p class="plan-note">Per provare la rete prima di decidere.</p>
+            <p class="plan-note">Per provare la rete: con 5 inviti passi a Founders.</p>
             <button class="btn btn-ghost" onclick="switchPanel('iscrizione')">Iscriviti</button>
           </div>
         </div>
-        <p class="plans-foot">Nella rete i colleghi cercano i professionisti Pro. Se non sei Pro, per loro non esisti: attiva la membership e fatti trovare.</p>
-        <p class="plans-invite">🎁 Hai perso i primi 100? <strong>Invita 5 colleghi</strong> con l'albo verificato e ottieni anche tu i vantaggi Founders per 12 mesi: ricerca e contatti illimitati. Non è una membership Pro gratuita.</p>
+        <p class="plans-foot">Nella rete i colleghi cercano i Founders. Se non sei Founder, per loro non esisti: entra tra i primi 100 o invita 5 colleghi.</p>
+        <p class="plans-invite">🎁 Hai perso i primi 100? <strong>Invita 5 colleghi</strong> con l'albo verificato e diventi Founder anche tu, con tutte le funzioni per 12 mesi.</p>
       </div>
 
     </div>
@@ -484,14 +469,14 @@
     <div class="notice" id="signup-pending" style="display:none; border-left-color:var(--ocher);"></div>
 
     <div class="notice">
-      Nome, specializzazioni, area e presentazione sono visibili ai professionisti della rete quando il tuo profilo è Pro. Email e telefono non compaiono mai in chiaro: li vede solo chi usa "Mostra contatti", nei limiti del proprio piano.
+      Nome, specializzazioni, area e presentazione sono visibili ai professionisti della rete quando sei Founder. Email e telefono non compaiono mai in chiaro: li vede solo chi usa "Mostra contatti", nei limiti del proprio piano.
     </div>
 
     <div class="notice" id="notice-registrazione" style="border-left-color:var(--petrol-700); background:rgba(23,92,92,0.08);">
-      <strong style="color:var(--petrol-900);">Registrazione gratuita.</strong> I primi 100 iscritti sono <strong>Founders</strong>: ricerca e contatti illimitati per 12 mesi (posti rimasti: <strong class="founders-left">—</strong>). Per essere visibile ai colleghi e ricevere richieste serve la <strong>membership Pro (100 € all'anno oppure 10 € al mese)</strong>, che attivi dal tuo profilo dopo l'iscrizione.
+      <strong style="color:var(--petrol-900);">Registrazione gratuita.</strong> I primi 100 iscritti diventano <strong>Founders</strong>: profilo visibile ai colleghi, richieste di collaborazione, ricerca e contatti illimitati per 12 mesi (posti rimasti: <strong class="founders-left">—</strong>). Dopo i primi 100 puoi diventare Founder invitando 5 colleghi.
     </div>
 
-    <div class="notice" id="membership-banner" style="display:none;"></div>
+    <div class="notice" id="piano-banner" style="display:none;"></div>
     <div class="notice" id="albo-status" style="display:none;"></div>
 
     <div class="card">
@@ -586,7 +571,7 @@
 
     <div class="card" id="invite-box" style="display:none; margin-top:16px;">
       <h3 style="font-size:18px; color:var(--petrol-900);">Invita i colleghi</h3>
-      <p style="font-size:13px; color:var(--ink-soft); margin:6px 0 12px; line-height:1.5;">Manda il tuo link a un collega: può iscriversi gratis, anche senza attivare la membership. Quando <strong>5 colleghi invitati</strong> avranno l'iscrizione all'albo verificata, ottieni anche tu il piano <strong>Founders</strong> per 12 mesi: ricerca e contatti illimitati verso i professionisti Pro. Non è una membership Pro gratuita, e il premio è per chi non è già Founders.</p>
+      <p style="font-size:13px; color:var(--ink-soft); margin:6px 0 12px; line-height:1.5;">Manda il tuo link a un collega: può iscriversi gratis. Quando <strong>5 colleghi invitati</strong> avranno l'iscrizione all'albo verificata, diventi anche tu <strong>Founder</strong> per 12 mesi: profilo visibile, richieste di collaborazione, annunci, ricerca e contatti illimitati. Il premio è per chi non è già Founder.</p>
       <div class="founders-bar"><span id="invite-bar-fill"></span></div>
       <p class="mono" id="invite-progress" style="font-size:12px; color:var(--ink-soft); margin:8px 0 12px;"></p>
       <button class="btn btn-primary btn-small" onclick="condividiInvito()">Condividi il mio link</button>
@@ -693,9 +678,6 @@ async function registraInvito(codice){
 function founderEtichetta(d){ return d.founder_numero ? "Founder n. " + d.founder_numero : "Founder per gli inviti"; }
 const CONFIGURED = !SUPABASE_URL.startsWith("INCOLLA") && !SUPABASE_ANON_KEY.startsWith("INCOLLA");
 
-/* Link di pagamento Stripe — incolla qui i tuoi due Payment Link */
-const STRIPE_LINK_MENSILE = "https://buy.stripe.com/eVqfZh1yN1Eid8rgiFbMQ01";
-const STRIPE_LINK_ANNUALE = "https://buy.stripe.com/7sYcN5fpD0Aed8rfeBbMQ02";
 
 const SPECIALIZZAZIONI = ["Ortopedico","Sportivo","Neurologico","Pediatrico","Geriatrico","Posturale","Chirurgico / post-chirurgico","Vestibolare","Pavimento pelvico","Respiratorio"];
 const TIPI_PAZIENTE = ["Chirurgico","Anziano","Posturale","Sportivo","Ortopedico","Neurologico","Pediatrico"];
@@ -1035,8 +1017,8 @@ async function segnaTutteLette(){
 
 function messaggioBenvenuto(){
   return (currentProf && currentProf.founder)
-    ? (currentProf.founder_numero ? "Benvenuto tra i Founders, numero " + currentProf.founder_numero : "Benvenuto tra i Founders") + "! Hai ricerca e contatti illimitati per 12 mesi."
-    : "Profilo creato nel piano Free. Attiva la membership Pro per essere visibile ai colleghi.";
+    ? (currentProf.founder_numero ? "Benvenuto tra i Founders, numero " + currentProf.founder_numero : "Benvenuto tra i Founders") + "! Hai tutte le funzioni per 12 mesi: profilo visibile, richieste, ricerca e contatti illimitati."
+    : "Profilo creato nel piano Free. Invita 5 colleghi con l'albo verificato per diventare Founder.";
 }
 
 let emailInAttesa = null;
@@ -1135,7 +1117,7 @@ async function logout(){
   document.getElementById("field-password").style.display = "block";
   document.getElementById("btn-submit-prof").textContent = "Crea il mio profilo";
   document.getElementById("btn-logout").style.display = "none";
-  document.getElementById("membership-banner").style.display = "none";
+  document.getElementById("piano-banner").style.display = "none";
   const rbx = document.getElementById("review-links-box"); if(rbx) rbx.style.display = "none";
   const asx = document.getElementById("albo-status"); if(asx) asx.style.display = "none";
   const ibx = document.getElementById("invite-box"); if(ibx) ibx.style.display = "none";
@@ -1143,26 +1125,27 @@ async function logout(){
   switchPanel("home");
 }
 
+function vaiAgliInviti(){
+  switchPanel("iscrizione");
+  setTimeout(() => { const b = document.getElementById("invite-box"); if(b) b.scrollIntoView({ behavior: "smooth", block: "center" }); }, 250);
+}
+
 function renderPlanBanner(banner, d){
-  const ricontrolla = ` <span class="link-btn" style="text-decoration:underline; cursor:pointer;" onclick="refreshMembership()">Ricontrolla lo stato</span>.`;
   const founderOn = d.founder && d.founder_fino && new Date(d.founder_fino) > new Date();
   banner.classList.remove("error");
   if(d.membership_attiva){
-    const fino = d.membership_scadenza ? " Periodo in corso fino al " + dataIt(d.membership_scadenza) + "." : "";
-    banner.textContent = "✅ Membership Pro attiva: il tuo profilo è visibile e puoi ricevere richieste di collaborazione e segnalazioni." + fino;
+    banner.textContent = "✅ Accesso completo attivo: il tuo profilo è visibile e puoi ricevere richieste di collaborazione e segnalazioni.";
+    return;
+  }
+  if(founderOn){
+    banner.innerHTML = `🎖️ <strong>Sei ${founderEtichetta(d)}</strong>: profilo visibile ai colleghi, richieste di collaborazione, ricerca e contatti illimitati fino al ${dataIt(d.founder_fino)}.`;
     return;
   }
   banner.classList.add("error");
-  let testo;
-  if(founderOn){
-    testo = `🎖️ <strong>Sei ${founderEtichetta(d)}</strong>: ricerca e contatti illimitati verso i professionisti Pro fino al ${dataIt(d.founder_fino)}. Finché non attivi la membership Pro il tuo profilo <strong>non è visibile</strong> nella ricerca e non puoi ricevere richieste di collaborazione.`;
-  } else if(d.founder){
-    testo = `Il vantaggio Founders è terminato il ${dataIt(d.founder_fino)}. Ora sei nel piano Free: puoi cercare e contattare fino a 3 professionisti al mese e il tuo profilo <strong>non è visibile</strong> ai colleghi.`;
-  } else {
-    testo = `Sei nel piano <strong>Free</strong>: puoi cercare e contattare fino a 3 professionisti al mese. Il tuo profilo <strong>non è visibile</strong> ai colleghi e non puoi ricevere richieste di collaborazione.`;
-  }
-  banner.innerHTML = `${testo}<br><br>${proBtnHtml(false)}
-    <p style="font-size:11.5px; margin-top:10px; color:var(--ink-soft);">Dopo il pagamento la membership Pro si attiva in automatico, di solito entro un minuto.${ricontrolla}</p>`;
+  const testo = d.founder
+    ? `Il vantaggio Founders è terminato il ${dataIt(d.founder_fino)}. Ora sei nel piano <strong>Free</strong>: puoi cercare e contattare fino a 3 professionisti al mese e il tuo profilo <strong>non è visibile</strong> ai colleghi.`
+    : `Sei nel piano <strong>Free</strong>: puoi cercare e contattare fino a 3 professionisti al mese. Il tuo profilo <strong>non è visibile</strong> ai colleghi e non puoi ricevere richieste di collaborazione.`;
+  banner.innerHTML = `${testo}<br><br><button class="btn btn-primary btn-small" onclick="vaiAgliInviti()">Invita 5 colleghi e diventa Founder</button>`;
 }
 
 async function loadOwnProfileIntoForm(){
@@ -1178,7 +1161,7 @@ async function loadOwnProfileIntoForm(){
     editingProfId = null;
     document.getElementById("btn-submit-prof").textContent = "Crea il mio profilo";
     document.getElementById("field-password").style.display = "none";
-    document.getElementById("membership-banner").style.display = "none";
+    document.getElementById("piano-banner").style.display = "none";
     const rb = document.getElementById("review-links-box"); if(rb) rb.style.display = "none";
     const as0 = document.getElementById("albo-status"); if(as0) as0.style.display = "none";
     const ib0 = document.getElementById("invite-box"); if(ib0) ib0.style.display = "none";
@@ -1188,7 +1171,7 @@ async function loadOwnProfileIntoForm(){
   editingProfId = data.id;
   refreshReviewLinksBox();
   loadInvitiBox();
-  const banner = document.getElementById("membership-banner");
+  const banner = document.getElementById("piano-banner");
   banner.style.display = "block";
   renderPlanBanner(banner, data);
   document.getElementById("in-nome").value = data.nome || "";
@@ -1245,7 +1228,7 @@ async function loadResults(){
   if(isMember()) await loadThanksBox(); else { const tb = document.getElementById("thanks-box"); if(tb) tb.innerHTML = ""; }
   resultsEl.innerHTML = '<div class="empty">Caricamento...</div>';
 
-  let query = sb.from("professionisti").select("id,user_id,nome,professione,specializzazione_medica,corsi_fisio,altre_specializzazioni,specializzazioni,area,modalita,tipi_paziente,bio,lat,lng,membership_attiva,albo_ordine,albo_provincia,albo_verificato,created_at").eq("membership_attiva", true).order("created_at", { ascending:false });
+  let query = sb.from("professionisti").select("id,user_id,nome,professione,specializzazione_medica,corsi_fisio,altre_specializzazioni,specializzazioni,area,modalita,tipi_paziente,bio,lat,lng,membership_attiva,albo_ordine,albo_provincia,albo_verificato,created_at").or("membership_attiva.eq.true,and(founder.eq.true,founder_fino.gt." + new Date().toISOString() + ")").order("created_at", { ascending:false });
 
   const fSpec = document.getElementById("f-spec").value;
   const fArea = document.getElementById("f-area").value.trim();
@@ -1369,7 +1352,7 @@ async function submitThanks(segId){
 async function refreshReviewLinksBox(){
   const box = document.getElementById("review-links-box");
   if(!box) return;
-  if(!editingProfId || !currentProf || !currentProf.membership_attiva){ box.style.display = "none"; return; }
+  if(!editingProfId || !currentProf || !isMember()){ box.style.display = "none"; return; }
   box.style.display = "block";
   const { count } = await sb.from("inviti_recensione").select("*", { count: "exact", head: true }).eq("prof_id", editingProfId).is("used_at", null);
   document.getElementById("review-links-pending").textContent = count ? "Link generati e non ancora usati: " + count : "Nessun link in attesa.";
@@ -1451,7 +1434,7 @@ function escapeHtml(s){ const d = document.createElement("div"); d.textContent =
   document.getElementById(id).addEventListener("input", loadResults);
 });
 
-/* ================= ACCESSO ALLA RICERCA: SOLO SOCI ================= */
+/* ================= ACCESSO ALLA RICERCA ================= */
 let profLoadTried = false;
 
 async function ensureProfLoaded(){
@@ -1461,24 +1444,8 @@ async function ensureProfLoaded(){
   if(data && data.length) currentProf = data[0];
 }
 
-async function refreshMembership(){
-  profLoadTried = false;
-  currentProf = null;
-  await ensureProfLoaded();
-  if(editingProfId) await loadOwnProfileIntoForm();
-  if(currentProf && currentProf.membership_attiva){ showToast("Membership attiva. Buona ricerca!"); }
-  else { showToast("La membership non risulta ancora attiva."); }
-  loadResults();
-}
-
-function stripeLink(base, email){
-  // client_reference_id permette a Stripe di dire al webhook quale utente ha pagato
-  return base + "?prefilled_email=" + encodeURIComponent(email || (currentUser && currentUser.email) || "")
-    + "&client_reference_id=" + encodeURIComponent(currentUser ? currentUser.id : "");
-}
-
 function gateHtml(){
-  return `<div class="notice error"><strong>Crea prima il tuo profilo gratuito.</strong> Per cercare i colleghi serve un profilo: la registrazione è gratuita e i primi 100 iscritti diventano Founders, con ricerca e contatti illimitati per 12 mesi.<br><br>
+  return `<div class="notice error"><strong>Crea prima il tuo profilo gratuito.</strong> Per cercare i colleghi serve un profilo: la registrazione è gratuita e i primi 100 iscritti diventano Founders, con tutte le funzioni per 12 mesi.<br><br>
     <button class="btn btn-primary btn-small" onclick="switchPanel('iscrizione')">Crea il mio profilo</button></div>`;
 }
 
@@ -1593,19 +1560,10 @@ function renderMap(list, raggio){
 }
 
 /* ================= ANNUNCI ================= */
-function isMember(){ return !!(currentUser && currentProf && currentProf.membership_attiva); }
+function isMember(){ return !!(currentUser && currentProf && (currentProf.membership_attiva || founderAttivo())); }   // accesso completo
 function founderAttivo(){ return !!(currentUser && currentProf && currentProf.founder && currentProf.founder_fino && new Date(currentProf.founder_fino) > new Date()); }
-function pianoCorrente(){ return isMember() ? "pro" : (founderAttivo() ? "founder" : "free"); }
+function pianoCorrente(){ return (currentProf && currentProf.membership_attiva) ? "pro" : (founderAttivo() ? "founder" : "free"); }
 function dataIt(v){ try{ return new Date(v).toLocaleDateString("it-IT"); }catch(e){ return ""; } }
-function proBtnHtml(small){
-  const sz = small ? " btn-small" : "";
-  const email = currentProf && currentProf.email;
-  return `<span style="display:inline-flex; flex-wrap:wrap; gap:8px;">
-    <a href="${stripeLink(STRIPE_LINK_ANNUALE, email)}" target="_blank" class="btn btn-primary${sz}" style="text-decoration:none; display:inline-block;">Pro annuale — 100 €/anno</a>
-    <a href="${stripeLink(STRIPE_LINK_MENSILE, email)}" target="_blank" class="btn btn-ghost${sz}" style="text-decoration:none; display:inline-block;">Pro mensile — 10 €/mese</a>
-  </span>`;
-}
-
 async function loadFoundersCounter(){
   if(!CONFIGURED) return;
   const { data } = await sb.rpc("founders_posti");
@@ -1626,18 +1584,18 @@ async function renderQuotaBox(){
   if(!el) return;
   const piano = pianoCorrente();
   if(piano === "pro"){
-    el.innerHTML = '<div class="quota-bar">✅ <strong>Piano Pro</strong>: ricerca e contatti illimitati, profilo visibile ai colleghi.</div>';
+    el.innerHTML = '<div class="quota-bar">✅ <strong>Accesso completo</strong>: ricerca e contatti illimitati, profilo visibile ai colleghi.</div>';
+    return;
+  }
+  if(piano === "founder"){
+    el.innerHTML = `<div class="quota-bar founder">🎖️ <strong>${founderEtichetta(currentProf)}</strong>: ricerca e contatti illimitati fino al ${dataIt(currentProf.founder_fino)}, con un massimo di 50 nuovi contatti ogni 24 ore. Il tuo profilo è visibile ai colleghi.</div>`;
     return;
   }
   const { data } = await sb.rpc("contatti_usati");
   const u = Array.isArray(data) ? data[0] : data;
-  if(piano === "founder"){
-    el.innerHTML = `<div class="quota-bar founder">🎖️ <strong>${founderEtichetta(currentProf)}</strong>: contatti illimitati verso i professionisti Pro fino al ${dataIt(currentProf.founder_fino)} (massimo 20 al giorno). Il tuo profilo non è visibile ai colleghi.<br><div style="margin-top:8px;">${proBtnHtml(true)}</div></div>`;
-  } else {
-    const usati = u ? u.mese : 0;
-    const scaduto = currentProf && currentProf.founder ? " Il vantaggio Founders è terminato." : "";
-    el.innerHTML = `<div class="quota-bar free"><strong>Piano Free</strong>: contatti usati questo mese ${usati}/3.${scaduto} Il tuo profilo non è visibile ai colleghi.<br><div style="margin-top:8px;">${proBtnHtml(true)}</div></div>`;
-  }
+  const usati = u ? u.mese : 0;
+  const scaduto = currentProf && currentProf.founder ? " Il vantaggio Founders è terminato." : "";
+  el.innerHTML = `<div class="quota-bar free"><strong>Piano Free</strong>: contatti usati questo mese ${usati}/3.${scaduto} Il tuo profilo non è visibile ai colleghi.<br><div style="margin-top:8px;"><button class="btn btn-primary btn-small" onclick="vaiAgliInviti()">Invita 5 colleghi e diventa Founder</button></div></div>`;
 }
 
 async function mostraContatti(profId){
@@ -1703,13 +1661,13 @@ async function loadHomeAnnunci(){
 
 function toggleAnnForm(){
   if(!currentUser){ showToast("Accedi per pubblicare un annuncio."); switchPanel("accedi"); return; }
-  if(!isMember()){ showToast("Serve una membership attiva per pubblicare annunci."); return; }
+  if(!isMember()){ showToast("Serve il piano Founders per pubblicare annunci."); return; }
   const f = document.getElementById("ann-form");
   f.style.display = (f.style.display === "none") ? "block" : "none";
 }
 
 async function publishAnnuncio(){
-  if(!isMember()){ showToast("Serve una membership attiva per pubblicare annunci."); return; }
+  if(!isMember()){ showToast("Serve il piano Founders per pubblicare annunci."); return; }
   const tipo = document.getElementById("ann-tipo").value;
   const zonaIn = document.getElementById("ann-zona").value.trim();
   const modalita = document.getElementById("ann-mod").value;
@@ -1807,7 +1765,7 @@ async function loadAnnunci(){
     } else if(!currentUser){
       action = `<button class="btn btn-ghost btn-small" onclick="switchPanel('accedi')">Accedi per richiedere i dettagli</button>`;
     } else if(!(isMember() || founderAttivo())){
-      action = `<div class="ann-status">Serve la membership Pro (o il vantaggio Founders) per richiedere i dettagli.</div>`;
+      action = `<div class="ann-status">Serve il piano Founders per richiedere i dettagli.</div>`;
     } else if(stato === "approvata"){
       const au = authorsMap[a.id];
       action = `${annDetailHtml(detailsMap[a.id])}
@@ -1830,7 +1788,7 @@ async function loadAnnunci(){
 }
 
 async function richiediDettagli(annId){
-  if(!(isMember() || founderAttivo())){ showToast("Serve la membership Pro o il vantaggio Founders."); return; }
+  if(!(isMember() || founderAttivo())){ showToast("Serve il piano Founders."); return; }
   const { error } = await sb.from("annunci_richieste").insert({
     annuncio_id: annId,
     richiedente_id: currentUser.id,
@@ -1860,7 +1818,7 @@ async function chiudiAnnuncio(annId){
 /* ============ SEGNALAZIONI (conferma del paziente, senza compensi) ============ */
 async function creaSegnalazione(profId){
   if(!currentUser){ showToast("Accedi per segnalare un paziente a un collega."); switchPanel("accedi"); return; }
-  if(!isMember()){ showToast("Serve una membership attiva per creare segnalazioni."); return; }
+  if(!isMember()){ showToast("Serve il piano Founders per creare segnalazioni."); return; }
   if(currentProf && currentProf.id === profId){ showToast("Non puoi segnalare un paziente a te stesso."); return; }
 
   const { data, error } = await sb.from("segnalazioni").insert({
